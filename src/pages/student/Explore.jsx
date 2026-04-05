@@ -16,7 +16,7 @@ const Explore = ({ isGuest = false }) => {
     const [savedProgramIds, setSavedProgramIds] = useState([]);
 
     useEffect(() => {
-        fetch('https://sproj-backend-x1wg.onrender.com/api/scholarships')
+        fetch('https://sproj-backend-x1wg.onrender.com/api/programs')
             .then(res => res.json())
             .then(data => { setPrograms(data); setLoading(false); })
             .catch(() => setLoading(false));
@@ -42,19 +42,19 @@ const Explore = ({ isGuest = false }) => {
     };
 
     const countries = ['All', ...new Set(programs.map(u => u.country))];
-    const degrees   = ['All', ...new Set(programs.map(u => u.program?.split(' ')[0]))];
+    const degrees = ['All', ...new Set(programs.map(u => u.program?.split(' ')[0]))];
     const durations = ['All', ...new Set(programs.map(u => u.duration))];
 
     const filteredPrograms = programs.filter(program => {
         const matchesSearch = program.program?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             program.university?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCountry  = selectedCountry === 'All' || program.country === selectedCountry;
-        const matchesDegree   = selectedDegree === 'All'  || program.program?.startsWith(selectedDegree);
+        const matchesCountry = selectedCountry === 'All' || program.country === selectedCountry;
+        const matchesDegree = selectedDegree === 'All' || program.program?.startsWith(selectedDegree);
         const matchesDuration = selectedDuration === 'All' || program.duration === selectedDuration;
-        const matchesBudget   = Number(program.tuition) >= budgetRange[0] && Number(program.tuition) <= budgetRange[1];
+        const matchesBudget = Number(program.tuition) >= budgetRange[0] && Number(program.tuition) <= budgetRange[1];
         return matchesSearch && matchesCountry && matchesDegree && matchesDuration && matchesBudget;
     }).sort((a, b) => {
-        if (sortBy === 'price_low')  return Number(a.tuition) - Number(b.tuition);
+        if (sortBy === 'price_low') return Number(a.tuition) - Number(b.tuition);
         if (sortBy === 'price_high') return Number(b.tuition) - Number(a.tuition);
         return a.id - b.id;
     });
