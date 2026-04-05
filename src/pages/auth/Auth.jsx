@@ -39,15 +39,12 @@ const Auth = () => {
                 await AuthService.register(formData);
                 navigate('/student/profile-setup');
             } else {
-                // Admin Login Check
-                if (formData.email === 'admin@gmail.com' && formData.password === 'edvoyageadmin') {
+                const user = await AuthService.login(formData.email, formData.password);
+                if (user.isAdmin) {
                     navigate('/admin/dashboard');
-                    return;
+                } else {
+                    navigate('/student/dashboard');
                 }
-
-                // Student/Regular User Login
-                await AuthService.login(formData.email, formData.password);
-                navigate('/student/dashboard');
             }
         } catch (err) {
             setError(err.message);
@@ -55,6 +52,7 @@ const Auth = () => {
             setIsLoading(false);
         }
     };
+
 
     const toggleMode = () => {
         setIsSignUp(!isSignUp);

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Calendar, DollarSign, Clock, CheckCircle, Bookmark, PlusCircle, ChevronLeft, Building2, GraduationCap, Globe } from 'lucide-react';
-import universitiesData from '../../data/universities.json';
 import AuthService from '../../services/AuthService';
+
 
 const ProgramDetails = () => {
     const { id } = useParams();
@@ -15,45 +15,47 @@ const ProgramDetails = () => {
         const currentUser = AuthService.getCurrentUser();
         setUser(currentUser);
 
-        const found = universitiesData.find(p => p.id === parseInt(id));
-        setProgram(found);
-
-        if (currentUser && found) {
-            setIsSaved(AuthService.isProgramSaved(found.id));
-        }
+        fetch(`/api/programs/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                setProgram(data);
+                if (currentUser) {
+                    setIsSaved(AuthService.isProgramSaved(data.id));
+                }
+            })
+            .catch(err => console.error('Failed to load program:', err));
     }, [id]);
 
-    const handleSave = () => {
-        if (!user) {
-            alert('Please login to save programs');
-            return;
+    const handleSave = async () => {
+        if (!user) { alert('Please login to save programs'); return; }
+        try {
+            const newStatus = await AuthService.toggleSavedProgram(program);
+            setIsSaved(newStatus);
+        } catch (err) {
+            console.error('Save failed:', err.message);
         }
-        const newStatus = AuthService.toggleSavedProgram(program);
-        setIsSaved(newStatus);
     };
 
-    const handleAddToTracker = () => {
-        if (!user) {
-            alert('Please login to start an application');
-            return;
+    const handleAddToTracker = async () => {
+        if (!user) { alert('Please login to start an application'); return; }
+        try {
+            await AuthService.addApplication({
+                programId:   program.id,
+                university:  program.university,
+                program:     program.program,
+                deadline:    program.deadline,
+                country:     program.country,
+                status:      'pending',
+            });
+            navigate('/student/tracker');
+        } catch (err) {
+            console.error('Failed to add application:', err.message);
         }
-
-        // Corrected application object matching demoUserData schema and Tracker expectations
-        const application = {
-            programId: program.id,
-            university: program.university,
-            program: program.program,
-            deadline: program.deadline,
-            country: program.country,
-            status: 'pending',
-            appliedDate: new Date().toISOString().split('T')[0]
-        };
-
-        AuthService.addApplication(application);
-        navigate('/student/tracker');
     };
+
 
     if (!program) return <div className="p-12 text-center text-slate-500 font-bold animate-pulse">Loading program details...</div>;
+
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12 max-w-6xl mx-auto space-y-6">

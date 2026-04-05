@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Calendar, DollarSign, Clock, CheckCircle, Bookmark, ExternalLink, ChevronLeft, Building2, GraduationCap, Globe, Award, Sparkles } from 'lucide-react';
-import scholarshipsData from '../../data/scholarships.json';
 import AuthService from '../../services/AuthService';
+
 
 const ScholarshipDetails = () => {
     const { id } = useParams();
@@ -11,21 +11,26 @@ const ScholarshipDetails = () => {
     const [isSaved, setIsSaved] = useState(false);
 
     useEffect(() => {
-        const found = scholarshipsData.find(s => s.id === parseInt(id));
-        setScholarship(found);
-
-        // Check if scholarship is already saved
-        if (found) {
-            setIsSaved(AuthService.isScholarshipSaved(found.id));
-        }
+        fetch(`/api/scholarships/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                setScholarship(data);
+                setIsSaved(AuthService.isScholarshipSaved(data.id));
+            })
+            .catch(err => console.error('Failed to load scholarship:', err));
     }, [id]);
 
     if (!scholarship) return <div className="p-12 text-center text-slate-500 font-bold animate-pulse">Loading scholarship details...</div>;
 
-    const handleSaveScholarship = () => {
-        const newSavedState = AuthService.toggleSavedScholarship(scholarship);
-        setIsSaved(newSavedState);
+    const handleSaveScholarship = async () => {
+        try {
+            const newSavedState = await AuthService.toggleSavedScholarship(scholarship);
+            setIsSaved(newSavedState);
+        } catch (err) {
+            console.error('Save failed:', err.message);
+        }
     };
+
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12 max-w-6xl mx-auto space-y-6">

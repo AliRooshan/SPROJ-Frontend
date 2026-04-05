@@ -1,57 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, MapPin, SlidersHorizontal, ArrowUpDown, X, Globe, Clock, Sparkles } from 'lucide-react';
 import ProgramCard from '../../components/ProgramCard';
-import universitiesData from '../../data/universities.json';
 import AuthService from '../../services/AuthService';
 
 const Explore = ({ isGuest = false }) => {
+    const [programs, setPrograms] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCountry, setSelectedCountry] = useState('All');
     const [selectedDegree, setSelectedDegree] = useState('All');
     const [selectedDuration, setSelectedDuration] = useState('All');
     const [budgetRange, setBudgetRange] = useState([0, 50000]);
     const [showFilters, setShowFilters] = useState(false);
-    const [sortBy, setSortBy] = useState('match'); // 'match', 'price_low', 'price_high'
+    const [sortBy, setSortBy] = useState('id');
     const [savedProgramIds, setSavedProgramIds] = useState([]);
 
     useEffect(() => {
-        // Fetch initially saved programs
+        fetch('/api/programs')
+            .then(res => res.json())
+            .then(data => { setPrograms(data); setLoading(false); })
+            .catch(() => setLoading(false));
+
         const currentUser = AuthService.getCurrentUser();
-        if (currentUser && currentUser.savedPrograms) {
-            setSavedProgramIds(currentUser.savedPrograms.map(p => p.id));
+        if (currentUser) {
+            setSavedProgramIds((currentUser.savedPrograms ?? []).map(p => p.program_id ?? p.id));
         }
     }, []);
 
-    const handleToggleSave = (program) => {
-        if (isGuest) return; // Guests can't save
-
-        const isNowSaved = AuthService.toggleSavedProgram(program);
-
-        if (isNowSaved) {
-            setSavedProgramIds(prev => [...prev, program.id]);
-        } else {
-            setSavedProgramIds(prev => prev.filter(id => id !== program.id));
+    const handleToggleSave = async (program) => {
+        if (isGuest) return;
+        try {
+            const isNowSaved = await AuthService.toggleSavedProgram(program);
+            if (isNowSaved) {
+                setSavedProgramIds(prev => [...prev, program.id]);
+            } else {
+                setSavedProgramIds(prev => prev.filter(id => id !== program.id));
+            }
+        } catch (err) {
+            console.error('Save failed:', err.message);
         }
     };
 
-    const countries = ['All', ...new Set(universitiesData.map(u => u.country))];
-    const degrees = ['All', ...new Set(universitiesData.map(u => u.program.split(' ')[0]))];
-    const durations = ['All', ...new Set(universitiesData.map(u => u.duration))];
+    const countries = ['All', ...new Set(programs.map(u => u.country))];
+    const degrees   = ['All', ...new Set(programs.map(u => u.program?.split(' ')[0]))];
+    const durations = ['All', ...new Set(programs.map(u => u.duration))];
 
-    const filteredPrograms = universitiesData.filter(program => {
-        const matchesSearch = program.program.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            program.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCountry = selectedCountry === 'All' || program.country === selectedCountry;
-        const matchesDegree = selectedDegree === 'All' || program.program.startsWith(selectedDegree);
+    const filteredPrograms = programs.filter(program => {
+        const matchesSearch = program.program?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            program.university?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCountry  = selectedCountry === 'All' || program.country === selectedCountry;
+        const matchesDegree   = selectedDegree === 'All'  || program.program?.startsWith(selectedDegree);
         const matchesDuration = selectedDuration === 'All' || program.duration === selectedDuration;
-        const matchesBudget = program.tuition >= budgetRange[0] && program.tuition <= budgetRange[1];
-
+        const matchesBudget   = Number(program.tuition) >= budgetRange[0] && Number(program.tuition) <= budgetRange[1];
         return matchesSearch && matchesCountry && matchesDegree && matchesDuration && matchesBudget;
     }).sort((a, b) => {
-        if (sortBy === 'price_low') return a.tuition - b.tuition;
-        if (sortBy === 'price_high') return b.tuition - a.tuition;
-        return b.matchScore - a.matchScore; // Default to match score
+        if (sortBy === 'price_low')  return Number(a.tuition) - Number(b.tuition);
+        if (sortBy === 'price_high') return Number(b.tuition) - Number(a.tuition);
+        return a.id - b.id;
     });
+
 
     const activeFilterCount = [
         selectedCountry !== 'All',

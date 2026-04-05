@@ -1,28 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, Plus, Filter, MoreHorizontal, BookOpen, MapPin, X, Edit2, Trash2 } from 'lucide-react';
-import universitiesData from '../../data/universities.json';
+import api from '../../services/api';
 
 const ManagePrograms = () => {
-    // attributes in universities.json: id, university, program, country, deadline, tuition, currency, image, logo
-    const allPrograms = universitiesData.map(item => ({
-        id: item.id,
-        name: item.program,
-        universityName: item.university,
-        location: item.country,
-        uniImage: item.logo || item.image, // Use logo if available, else campus image
-        fees: `${item.currency}${item.tuition.toLocaleString()}`,
-        duration: '2 Years' // Default/Placeholder as it's not in the JSON
-    }));
-
-
-
     const [searchTerm, setSearchTerm] = useState('');
     const [searchParams, setSearchParams] = useSearchParams();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingProgram, setEditingProgram] = useState(null);
-    const [localPrograms, setLocalPrograms] = useState(allPrograms);
+    const [localPrograms, setLocalPrograms] = useState([]);
+    const [allPrograms, setAllPrograms] = useState([]);
+
+    useEffect(() => {
+        api.get('/programs')
+            .then(data => {
+                const mapped = data.map(item => ({
+                    id: item.id,
+                    name: item.program,
+                    universityName: item.university,
+                    location: item.country,
+                    uniImage: item.logo || item.image,
+                    fees: `${item.currency}${Number(item.tuition).toLocaleString()}`,
+                    duration: item.duration || '2 Years'
+                }));
+                setAllPrograms(mapped);
+                setLocalPrograms(mapped);
+            })
+            .catch(console.error);
+    }, []);
+
     const [filterCountry, setFilterCountry] = useState('All');
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [openMenuId, setOpenMenuId] = useState(null);

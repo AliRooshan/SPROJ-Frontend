@@ -1,354 +1,253 @@
 /**
- * AuthService to manage local user authentication and storage.
- * Simulates a backend by storing users in localStorage under 'edvoyage_users'.
- * Manages active session in 'edvoyage_session'.
+ * AuthService.js — All auth and user-data operations via the backend API.
+ * JWT is stored in localStorage under 'edvoyage_token'.
+ * User object (without password) is cached under 'edvoyage_session'.
  */
+import api from './api';
 
-import demoUserData from '../data/demoUserData';
-
-const USERS_KEY = 'edvoyage_users';
+const TOKEN_KEY   = 'edvoyage_token';
 const SESSION_KEY = 'edvoyage_session';
 
-// Helper to get users
-const getUsers = () => {
-    const users = localStorage.getItem(USERS_KEY);
-    return users ? JSON.parse(users) : [];
+// ── Helpers ────────────────────────────────────────────────────────────────────
+
+/** Map DB snake_case user fields → frontend camelCase */
+const normaliseUser = (u) => ({
+  id:              u.id,
+  email:           u.email,
+  fullName:        u.full_name   ?? u.fullName   ?? '',
+  phone:           u.phone       ?? '',
+  degree:          u.degree      ?? '',
+  major:           u.major       ?? '',
+  gpa:             u.gpa         ?? '',
+  englishTest:     u.english_test  ?? u.englishTest  ?? '',
+  englishScore:    u.english_score ?? u.englishScore ?? '',
+  targetCountries: u.target_countries ?? u.targetCountries ?? [],
+  intake:          u.intake      ?? '',
+  budget:          u.budget      ?? '',
+  careerGoal:      u.career_goal ?? u.careerGoal ?? '',
+  isAdmin:         u.is_admin    ?? false,
+  savedPrograms:      u.savedPrograms      ?? [],
+  savedScholarships:  u.savedScholarships  ?? [],
+  notifications:   u.notifications ?? { email: true, push: false, deadlines: true },
+  privacy:         u.privacy      ?? { publicProfile: false, shareData: true },
+});
+
+const saveSession = (token, user) => {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(SESSION_KEY, JSON.stringify(normaliseUser(user)));
 };
 
-// Helper to save users
-const saveUsers = (users) => {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+const updateSession = (user) => {
+  localStorage.setItem(SESSION_KEY, JSON.stringify(normaliseUser(user)));
 };
+
+// ── Auth ───────────────────────────────────────────────────────────────────────
+
+const register = async ({ fullName, phone, email, password }) => {
+  const data = await api.post('/auth/register', {
+    full_name: fullName,
+    phone,
+    email,
+    password,
+  });
+  saveSession(data.token, data.user);
+  return data.user;
+};
+
+const login = async (email, password) => {
+  const data = await api.post('/auth/login', { email, password });
+  saveSession(data.token, data.user);
+  return data.user;
+};
+
+const logout = () => {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(SESSION_KEY);
+};
+
+const getCurrentUser = () => {
+  const raw = localStorage.getItem(SESSION_KEY);
+  return raw ? JSON.parse(raw) : null;
+};
+
+const getToken = () => localStorage.getItem(TOKEN_KEY);
+
+const isAuthenticated = () => !!getToken();
+
+// ── Profile ────────────────────────────────────────────────────────────────────
+
+const updateProfile = async (formData) => {
+  const user = getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const payload = {
+    full_name:        formData.fullName,
+    phone:            formData.phone,
+    degree:           formData.degree,
+    major:            formData.major,
+    gpa:              formData.gpa,
+    english_test:     formData.englishTest,
+    english_score:    formData.englishScore,
+    target_countries: formData.targetCountries,
+    intake:           formData.intake,
+    budget:           formData.budget,
+    career_goal:      formData.careerGoal,
+  };
+
+  const updated = await api.put(`/users/${user.id}/profile`, payload);
+  updateSession(updated);
+  return updated;
+};
+
+// ── Saved Programs ─────────────────────────────────────────────────────────────
+
+const getSavedPrograms = async () => {
+  const user = getCurrentUser();
+  if (!user) return [];
+  const data = await api.get(`/users/${user.id}/saved-programs`);
+  // Refresh the cached saved list
+  const updated = { ...user, savedPrograms: data };
+  updateSession(updated);
+  return data;
+};
+
+const isProgramSaved = (programId) => {
+  const user = getCurrentUser();
+  if (!user) return false;
+  return (user.savedPrograms ?? []).some(p =>
+    (p.program_id ?? p.id) === programId
+  );
+};
+
+/**
+ * Toggles a saved program.
+ * Returns true if now saved, false if now unsaved.
+ */
+const toggleSavedProgram = async (program) => {
+  const user = getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const alreadySaved = isProgramSaved(program.id);
+
+  if (alreadySaved) {
+    await api.delete(`/users/${user.id}/saved-programs/${program.id}`);
+    const updated = {
+      ...user,
+      savedPrograms: (user.savedPrograms ?? []).filter(
+        p => (p.program_id ?? p.id) !== program.id
+      ),
+    };
+    updateSession(updated);
+    return false;
+  } else {
+    await api.post(`/users/${user.id}/saved-programs`, { program_id: program.id });
+    const updated = {
+      ...user,
+      savedPrograms: [...(user.savedPrograms ?? []), { program_id: program.id, ...program }],
+    };
+    updateSession(updated);
+    return true;
+  }
+};
+
+// ── Saved Scholarships ─────────────────────────────────────────────────────────
+
+const getSavedScholarships = async () => {
+  const user = getCurrentUser();
+  if (!user) return [];
+  const data = await api.get(`/users/${user.id}/saved-scholarships`);
+  const updated = { ...user, savedScholarships: data };
+  updateSession(updated);
+  return data;
+};
+
+const isScholarshipSaved = (scholarshipId) => {
+  const user = getCurrentUser();
+  if (!user) return false;
+  return (user.savedScholarships ?? []).some(s =>
+    (s.scholarship_id ?? s.id) === scholarshipId
+  );
+};
+
+const toggleSavedScholarship = async (scholarship) => {
+  const user = getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const alreadySaved = isScholarshipSaved(scholarship.id);
+
+  if (alreadySaved) {
+    await api.delete(`/users/${user.id}/saved-scholarships/${scholarship.id}`);
+    const updated = {
+      ...user,
+      savedScholarships: (user.savedScholarships ?? []).filter(
+        s => (s.scholarship_id ?? s.id) !== scholarship.id
+      ),
+    };
+    updateSession(updated);
+    return false;
+  } else {
+    await api.post(`/users/${user.id}/saved-scholarships`, { scholarship_id: scholarship.id });
+    const updated = {
+      ...user,
+      savedScholarships: [...(user.savedScholarships ?? []), { scholarship_id: scholarship.id, ...scholarship }],
+    };
+    updateSession(updated);
+    return true;
+  }
+};
+
+// ── Applications ───────────────────────────────────────────────────────────────
+
+const getApplications = async () => {
+  const user = getCurrentUser();
+  if (!user) return [];
+  return api.get(`/users/${user.id}/applications`);
+};
+
+const addApplication = async (application) => {
+  const user = getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const payload = {
+    program_id:   application.programId,
+    university:   application.university,
+    program_name: application.program,
+    country:      application.country,
+    deadline:     application.deadline,
+    status:       application.status ?? 'pending',
+  };
+
+  return api.post(`/users/${user.id}/applications`, payload);
+};
+
+const updateApplicationStatus = async (applicationId, status) => {
+  const user = getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+  return api.put(`/users/${user.id}/applications/${applicationId}`, { status });
+};
+
+// ── Export ─────────────────────────────────────────────────────────────────────
 
 const AuthService = {
-    // Register a new user
-    register: (userData) => {
-        const users = getUsers();
-        const existing = users.find(u => u.email === userData.email);
-        if (existing) {
-            throw new Error('User already exists');
-        }
-
-        const newUser = {
-            id: Date.now().toString(),
-            ...userData,
-            fullName: userData.fullName || userData.email.split('@')[0],
-            joinedDate: new Date().toISOString(),
-            // Empty Data for new users - STRICT ISOLATION
-            stats: { saved: 0, pending: 0, accepted: 0 },
-            savedPrograms: [],
-            savedScholarships: [],
-            applications: [],
-            deadlines: [],
-            checklist: []
-        };
-
-        users.push(newUser);
-        saveUsers(users);
-
-        AuthService.login(userData.email, userData.password);
-        return newUser;
-    },
-
-    // Login user
-    login: (email, password) => {
-        const users = getUsers();
-        const user = users.find(u => u.email === email && u.password === password);
-
-        if (!user) {
-            throw new Error('Invalid email or password');
-        }
-
-        localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-        // Sync legacy key to keep other components working
-        localStorage.setItem('studentProfile', JSON.stringify(user));
-        return user;
-    },
-
-    // Get current logged in user
-    getCurrentUser: () => {
-        const session = localStorage.getItem(SESSION_KEY);
-        return session ? JSON.parse(session) : null;
-    },
-
-    // Update current user profile
-    updateProfile: (updatedData) => {
-        const currentUser = AuthService.getCurrentUser();
-        if (!currentUser) throw new Error('No user logged in');
-
-        const users = getUsers();
-        const userIndex = users.findIndex(u => u.id === currentUser.id);
-
-        if (userIndex === -1) throw new Error('User not found in database');
-
-        // Merge updates
-        const updatedUser = { ...users[userIndex], ...updatedData };
-        users[userIndex] = updatedUser;
-        saveUsers(users);
-
-        // Update session
-        localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
-        localStorage.setItem('studentProfile', JSON.stringify(updatedUser));
-
-        return updatedUser;
-    },
-
-    // Toggle saved program status
-    toggleSavedProgram: (program) => {
-        const currentUser = AuthService.getCurrentUser();
-        if (!currentUser) return false;
-
-        const users = getUsers();
-        const userIndex = users.findIndex(u => u.id === currentUser.id);
-        if (userIndex === -1) return false;
-
-        const user = users[userIndex];
-
-        // Initialize if missing
-        if (!user.savedPrograms) user.savedPrograms = [];
-        if (!user.stats) user.stats = { saved: 0, pending: 0, accepted: 0 };
-
-        const existingIndex = user.savedPrograms.findIndex(p => p.id === program.id);
-        let isSaved = false;
-
-        if (existingIndex > -1) {
-            // Remove
-            user.savedPrograms.splice(existingIndex, 1);
-            user.stats.saved = Math.max(0, user.stats.saved - 1);
-            isSaved = false;
-        } else {
-            // Add
-            user.savedPrograms.push(program);
-            user.stats.saved += 1;
-            isSaved = true;
-        }
-
-        users[userIndex] = user;
-        saveUsers(users);
-
-        // Update session
-        localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-        localStorage.setItem('studentProfile', JSON.stringify(user));
-
-        return isSaved;
-    },
-
-    // Check if program is saved
-    isProgramSaved: (programId) => {
-        const currentUser = AuthService.getCurrentUser();
-        if (!currentUser || !currentUser.savedPrograms) return false;
-        return currentUser.savedPrograms.some(p => p.id === programId);
-    },
-
-    // Get saved programs
-    getSavedPrograms: () => {
-        const currentUser = AuthService.getCurrentUser();
-        return currentUser?.savedPrograms || [];
-    },
-
-    // Add application
-    addApplication: (application) => {
-        const currentUser = AuthService.getCurrentUser();
-        if (!currentUser) return null;
-
-        const users = getUsers();
-        const userIndex = users.findIndex(u => u.id === currentUser.id);
-        if (userIndex === -1) return null;
-
-        const user = users[userIndex];
-        if (!user.applications) user.applications = [];
-        if (!user.deadlines) user.deadlines = [];
-        if (!user.stats) user.stats = { saved: 0, pending: 0, accepted: 0 };
-
-        const newApplication = {
-            id: Date.now(),
-            ...application,
-            appliedDate: new Date().toISOString().split('T')[0],
-            status: application.status || 'pending'
-        };
-
-        user.applications.push(newApplication);
-        user.stats.pending += 1;
-
-        // Automatically create a deadline entry for this application
-        if (application.deadline) {
-            const newDeadline = {
-                id: Date.now() + 1, // Ensure unique ID
-                university: application.university, // University name as title
-                task: 'Application', // Just the type
-                date: application.deadline,
-                status: 'pending',
-                applicationId: newApplication.id // Link to application
-            };
-            user.deadlines.push(newDeadline);
-        }
-
-        users[userIndex] = user;
-        saveUsers(users);
-
-        // Update session
-        localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-        localStorage.setItem('studentProfile', JSON.stringify(user));
-
-        return newApplication;
-    },
-
-    // Update application status
-    updateApplicationStatus: (applicationId, newStatus) => {
-        const currentUser = AuthService.getCurrentUser();
-        if (!currentUser) return false;
-
-        const users = getUsers();
-        const userIndex = users.findIndex(u => u.id === currentUser.id);
-        if (userIndex === -1) return false;
-
-        const user = users[userIndex];
-        if (!user.applications) return false;
-
-        const appIndex = user.applications.findIndex(a => a.id === applicationId);
-        if (appIndex === -1) return false;
-
-        const oldStatus = user.applications[appIndex].status;
-        user.applications[appIndex].status = newStatus;
-
-        // Update stats
-        if (oldStatus === 'pending') user.stats.pending = Math.max(0, user.stats.pending - 1);
-        if (oldStatus === 'accepted') user.stats.accepted = Math.max(0, user.stats.accepted - 1);
-
-        if (newStatus === 'pending') user.stats.pending += 1;
-        if (newStatus === 'accepted') user.stats.accepted += 1;
-
-        users[userIndex] = user;
-        saveUsers(users);
-
-        // Update session
-        localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-        localStorage.setItem('studentProfile', JSON.stringify(user));
-
-        return true;
-    },
-
-    // Get applications
-    getApplications: () => {
-        const currentUser = AuthService.getCurrentUser();
-        return currentUser?.applications || [];
-    },
-
-    // Toggle saved scholarship status
-    toggleSavedScholarship: (scholarship) => {
-        const currentUser = AuthService.getCurrentUser();
-        if (!currentUser) return false;
-
-        const users = getUsers();
-        const userIndex = users.findIndex(u => u.id === currentUser.id);
-        if (userIndex === -1) return false;
-
-        const user = users[userIndex];
-
-        // Initialize if missing
-        if (!user.savedScholarships) user.savedScholarships = [];
-
-        const existingIndex = user.savedScholarships.findIndex(s => s.id === scholarship.id);
-        let isSaved = false;
-
-        if (existingIndex > -1) {
-            // Remove
-            user.savedScholarships.splice(existingIndex, 1);
-            isSaved = false;
-        } else {
-            // Add
-            user.savedScholarships.push(scholarship);
-            isSaved = true;
-        }
-
-        users[userIndex] = user;
-        saveUsers(users);
-
-        // Update session
-        localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-        localStorage.setItem('studentProfile', JSON.stringify(user));
-
-        return isSaved;
-    },
-
-    // Check if scholarship is saved
-    isScholarshipSaved: (scholarshipId) => {
-        const currentUser = AuthService.getCurrentUser();
-        if (!currentUser || !currentUser.savedScholarships) return false;
-        return currentUser.savedScholarships.some(s => s.id === scholarshipId);
-    },
-
-    // Get saved scholarships
-    getSavedScholarships: () => {
-        const currentUser = AuthService.getCurrentUser();
-        return currentUser?.savedScholarships || [];
-    },
-
-    // Add deadline when application is started
-    addDeadline: (deadline) => {
-        const currentUser = AuthService.getCurrentUser();
-        if (!currentUser) return null;
-
-        const users = getUsers();
-        const userIndex = users.findIndex(u => u.id === currentUser.id);
-        if (userIndex === -1) return null;
-
-        const user = users[userIndex];
-        if (!user.deadlines) user.deadlines = [];
-
-        // Check if deadline already exists
-        const exists = user.deadlines.some(d => d.title === deadline.title);
-        if (!exists) {
-            user.deadlines.push(deadline);
-            users[userIndex] = user;
-            saveUsers(users);
-
-            // Update session
-            localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-            localStorage.setItem('studentProfile', JSON.stringify(user));
-        }
-
-        return deadline;
-    },
-
-
-    logout: () => {
-        localStorage.removeItem(SESSION_KEY);
-        localStorage.removeItem('studentProfile');
-    },
-
-    // Initialize with specific demo user if empty or missing
-    initDemoUser: () => {
-        const users = getUsers();
-        const demoEmail = 'alirooshan@gmail.com';
-        const existingIndex = users.findIndex(u => u.email === demoEmail);
-
-        if (existingIndex === -1) {
-            // Create new demo user from scratch
-            const aliUser = {
-                id: 'demo-ali',
-                joinedDate: new Date().toISOString(),
-                ...demoUserData
-            };
-            users.push(aliUser);
-            saveUsers(users);
-        } else {
-            // Update existing demo user with potentially new data from file
-            // We want to update their profile info but KEEP their saved programs/applications if possible
-            // OR do we want to overwrite? The user said "fill things for alirooshan".
-            // Let's safe update: Overwrite profile fields from demoUserData, but maybe keep existing ID.
-            const existingUser = users[existingIndex];
-            const updatedUser = {
-                ...existingUser,
-                ...demoUserData // Overwrite with file data
-            };
-            users[existingIndex] = updatedUser;
-            saveUsers(users);
-        }
-    }
+  register,
+  login,
+  logout,
+  getCurrentUser,
+  getToken,
+  isAuthenticated,
+  updateProfile,
+  // Programs
+  getSavedPrograms,
+  isProgramSaved,
+  toggleSavedProgram,
+  // Scholarships
+  getSavedScholarships,
+  isScholarshipSaved,
+  toggleSavedScholarship,
+  // Applications
+  getApplications,
+  addApplication,
+  updateApplicationStatus,
 };
-
-// Auto-init
-AuthService.initDemoUser();
 
 export default AuthService;

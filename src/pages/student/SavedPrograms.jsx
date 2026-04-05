@@ -13,18 +13,24 @@ const SavedPrograms = () => {
         const currentUser = AuthService.getCurrentUser();
         if (currentUser) {
             setUser(currentUser);
-            setSavedPrograms(currentUser.savedPrograms || []);
+            AuthService.getSavedPrograms()
+                .then(setSavedPrograms)
+                .catch(console.error);
         } else {
             navigate('/login/student');
         }
     }, [navigate]);
 
-    const handleToggleSave = (program) => {
-        AuthService.toggleSavedProgram(program);
-        const updated = AuthService.getCurrentUser();
-        setUser(updated);
-        setSavedPrograms(updated.savedPrograms || []);
+    const handleToggleSave = async (program) => {
+        try {
+            await AuthService.toggleSavedProgram(program);
+            const updated = await AuthService.getSavedPrograms();
+            setSavedPrograms(updated);
+        } catch (err) {
+            console.error('Save failed:', err.message);
+        }
     };
+
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-12">

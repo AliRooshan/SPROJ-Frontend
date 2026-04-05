@@ -1,23 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Award, CheckCircle, XCircle, GraduationCap, DollarSign, Sparkles, MapPin, ArrowRight, Building2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import scholarshipsData from '../../data/scholarships.json';
+
 
 const Scholarships = () => {
     const navigate = useNavigate();
+    const [scholarships, setScholarships] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('All');
 
-    // Get unique types for filter
-    const types = ['All', ...new Set(scholarshipsData.map(s => s.type))];
+    useEffect(() => {
+        fetch('/api/scholarships')
+            .then(res => res.json())
+            .then(data => setScholarships(data))
+            .catch(err => console.error('Failed to load scholarships:', err));
+    }, []);
 
-    const filtered = scholarshipsData.filter(s => {
+    // Get unique types for filter
+    const types = ['All', ...new Set(scholarships.map(s => s.type))];
+
+    const filtered = scholarships.filter(s => {
         const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             (s.provider && s.provider.toLowerCase().includes(searchTerm.toLowerCase())) ||
             s.country.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesFilter = filterType === 'All' || s.type === filterType;
         return matchesSearch && matchesFilter;
     });
+
 
     const checkEligibility = (status) => {
         return status === 'Eligible';

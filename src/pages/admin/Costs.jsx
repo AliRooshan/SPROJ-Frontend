@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DollarSign, RefreshCw, Save, MapPin, Plus, X } from 'lucide-react';
-import costsData from '../../data/costs.json';
+import api from '../../services/api';
 
 const ManageCosts = () => {
-    // Use real data from JSON
-    const [cities, setCities] = useState(costsData);
+    const [cities, setCities] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    useEffect(() => {
+        api.get('/costs')
+            .then(data => setCities(data))
+            .catch(console.error);
+    }, []);
 
     const handleAddExchangeRate = (e) => {
         e.preventDefault();

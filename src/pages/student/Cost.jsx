@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DollarSign, Home, Coffee, Bus, Info, Wallet, Calculator, Globe } from 'lucide-react';
-import costsData from '../../data/costs.json';
+
 
 const CostEstimator = () => {
-    const [selectedCity, setSelectedCity] = useState(costsData[0].city);
+    const [costsData, setCostsData] = useState([]);
+    const [selectedCity, setSelectedCity] = useState(null);
     const [lifestyle, setLifestyle] = useState('Moderate');
     const [showPKR, setShowPKR] = useState(false);
 
+    useEffect(() => {
+        fetch('/api/costs')
+            .then(res => res.json())
+            .then(data => {
+                setCostsData(data);
+                if (data.length > 0) setSelectedCity(data[0].city);
+            })
+            .catch(err => console.error('Failed to load costs:', err));
+    }, []);
+
     const cityData = costsData.find(c => c.city === selectedCity);
+
+    if (!cityData) return <div className="p-12 text-center text-slate-500 font-bold animate-pulse">Loading cost data...</div>;
+
 
     const exchangeRates = {
         'AUD': 185, 'USD': 278, 'GBP': 355, 'EUR': 305,

@@ -8,10 +8,9 @@ const Tracker = () => {
     const [applications, setApplications] = useState([]);
 
     useEffect(() => {
-        // Load user's applications
-        const userApplications = AuthService.getApplications();
-        setApplications(userApplications);
+        AuthService.getApplications().then(setApplications).catch(console.error);
     }, []);
+
 
     const statuses = ['pending', 'accepted', 'rejected'];
     const statusLabels = {
@@ -47,11 +46,16 @@ const Tracker = () => {
         }
     };
 
-    const moveApplication = (id, newStatus) => {
-        AuthService.updateApplicationStatus(id, newStatus);
-        const updated = AuthService.getApplications();
-        setApplications(updated);
+    const moveApplication = async (id, newStatus) => {
+        try {
+            await AuthService.updateApplicationStatus(id, newStatus);
+            const updated = await AuthService.getApplications();
+            setApplications(updated);
+        } catch (err) {
+            console.error('Failed to update status:', err.message);
+        }
     };
+
 
     const renderDateInfo = (app, status) => {
         if (status === 'rejected') return null;

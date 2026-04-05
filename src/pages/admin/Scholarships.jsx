@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Plus, Award, Calendar, Globe, X, Edit2 } from 'lucide-react';
-import scholarshipsData from '../../data/scholarships.json';
+import api from '../../services/api';
 
 const ManageScholarships = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingScholarship, setEditingScholarship] = useState(null);
-    const [localScholarships, setLocalScholarships] = useState(scholarshipsData);
+    const [localScholarships, setLocalScholarships] = useState([]);
+
+    useEffect(() => {
+        api.get('/scholarships')
+            .then(data => setLocalScholarships(data))
+            .catch(console.error);
+    }, []);
 
     // Check for URL action
     useEffect(() => {

@@ -12,18 +12,24 @@ const SavedScholarships = () => {
         const currentUser = AuthService.getCurrentUser();
         if (currentUser) {
             setUser(currentUser);
-            setSavedScholarships(currentUser.savedScholarships || []);
+            AuthService.getSavedScholarships()
+                .then(setSavedScholarships)
+                .catch(console.error);
         } else {
             navigate('/login/student');
         }
     }, [navigate]);
 
-    const handleToggleSave = (scholarship) => {
-        AuthService.toggleSavedScholarship(scholarship);
-        const updated = AuthService.getCurrentUser();
-        setUser(updated);
-        setSavedScholarships(updated.savedScholarships || []);
+    const handleToggleSave = async (scholarship) => {
+        try {
+            await AuthService.toggleSavedScholarship(scholarship);
+            const updated = await AuthService.getSavedScholarships();
+            setSavedScholarships(updated);
+        } catch (err) {
+            console.error('Save failed:', err.message);
+        }
     };
+
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-12">

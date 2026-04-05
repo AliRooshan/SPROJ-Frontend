@@ -76,15 +76,21 @@ const Profile = () => {
         }));
     };
 
-    const handleSave = () => {
+    const [saveStatus, setSaveStatus] = useState(''); // 'saving' | 'success' | 'error'
+
+    const handleSave = async () => {
+        setSaveStatus('saving');
         try {
-            AuthService.updateProfile(formData);
-            alert('Profile updated successfully!');
+            await AuthService.updateProfile(formData);
+            setSaveStatus('success');
+            setTimeout(() => setSaveStatus(''), 3000);
         } catch (error) {
-            console.error("Failed to save profile:", error);
-            alert("Failed to save profile.");
+            console.error('Failed to save profile:', error);
+            setSaveStatus('error');
+            setTimeout(() => setSaveStatus(''), 3000);
         }
     };
+
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500 pb-12">
@@ -119,11 +125,19 @@ const Profile = () => {
                         </div>
                         <button
                             onClick={handleSave}
-                            className="px-8 py-3.5 bg-white text-indigo-600 rounded-2xl font-bold hover:bg-indigo-50 transition-all flex items-center gap-2 shadow-lg hover:shadow-indigo-900/40 hover:-translate-y-1"
+                            disabled={saveStatus === 'saving'}
+                            className={`px-8 py-3.5 rounded-2xl font-bold transition-all flex items-center gap-2 shadow-lg hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed
+                                ${saveStatus === 'success' ? 'bg-emerald-500 text-white hover:shadow-emerald-900/40' :
+                                  saveStatus === 'error'   ? 'bg-red-500 text-white hover:shadow-red-900/40' :
+                                  'bg-white text-indigo-600 hover:bg-indigo-50 hover:shadow-indigo-900/40'}`}
                         >
                             <Save size={20} />
-                            Save Changes
+                            {saveStatus === 'saving'  ? 'Saving...' :
+                             saveStatus === 'success' ? 'Saved!' :
+                             saveStatus === 'error'   ? 'Error!' :
+                             'Save Changes'}
                         </button>
+
                     </div>
                 </div>
             </div>
