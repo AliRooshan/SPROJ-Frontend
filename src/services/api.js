@@ -5,7 +5,7 @@
  * - Throws an Error with the server's error message on failure
  */
 
-const BASE = '/api';
+const BASE = (import.meta.env.VITE_API_URL || '') + '/api';
 
 const getToken = () => localStorage.getItem('edvoyage_token');
 
@@ -28,10 +28,10 @@ const request = async (method, path, body = null) => {
 };
 
 const api = {
-  get:    (path)        => request('GET',    path),
-  post:   (path, body)  => request('POST',   path, body),
-  put:    (path, body)  => request('PUT',    path, body),
-  delete: (path)        => request('DELETE', path),
+  get: (path) => request('GET', path),
+  post: (path, body) => request('POST', path, body),
+  put: (path, body) => request('PUT', path, body),
+  delete: (path) => request('DELETE', path),
 };
 
 export default api;
