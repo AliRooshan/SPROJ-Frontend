@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, GraduationCap, DollarSign, Settings, LogOut, ShieldCheck, X } from 'lucide-react';
+import { LayoutDashboard, BookOpen, GraduationCap, DollarSign, Settings, LogOut, ShieldCheck } from 'lucide-react';
 import ConfirmDialog from './ConfirmDialog';
 
 const AdminSidebar = ({ isOpen, onClose }) => {

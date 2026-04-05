@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, MapPin, SlidersHorizontal, ArrowUpDown, X, BookOpen, Globe, GraduationCap, Clock, Sparkles } from 'lucide-react';
+import { Search, Filter, MapPin, SlidersHorizontal, ArrowUpDown, X, Globe, Clock, Sparkles } from 'lucide-react';
 import ProgramCard from '../../components/ProgramCard';
 import universitiesData from '../../data/universities.json';
 import AuthService from '../../services/AuthService';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Plus, Award, ChevronsRight, Calendar, Globe, X, Edit2 } from 'lucide-react';
+import { Plus, Award, Calendar, Globe, X, Edit2 } from 'lucide-react';
 import scholarshipsData from '../../data/scholarships.json';
 
 const ManageScholarships = () => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, BookOpen, GraduationCap, TrendingUp, DollarSign, Calendar, ArrowUpRight, Activity, Bell, X } from 'lucide-react';
+import { Users, BookOpen, GraduationCap, DollarSign, Calendar, Activity, Bell, X } from 'lucide-react';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();

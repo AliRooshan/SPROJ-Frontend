@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Bell, Shield, Save, Check, Settings, Book, Globe, MapPin, GraduationCap, Sparkles } from 'lucide-react';
+import { User, Bell, Shield, Save, Check, Settings, Globe, MapPin, GraduationCap } from 'lucide-react';
 import AuthService from '../../services/AuthService';
 
 const Profile = () => {

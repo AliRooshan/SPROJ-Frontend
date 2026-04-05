@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Compass, BookOpen, CheckCircle, Globe, ChevronRight, Star, Youtube, Twitter, Instagram, ArrowRight, Zap, Target, Shield, Rocket } from 'lucide-react';
+import { Compass, Globe, Star, Youtube, Twitter, Instagram, ArrowRight, Zap, Target, Shield, Rocket } from 'lucide-react';
 
 const Landing = () => {
     return (

@@ -332,7 +332,6 @@ const AuthService = {
             };
             users.push(aliUser);
             saveUsers(users);
-            console.log('Seeded Ali Rooshan user with demo data');
         } else {
             // Update existing demo user with potentially new data from file
             // We want to update their profile info but KEEP their saved programs/applications if possible
@@ -345,7 +344,6 @@ const AuthService = {
             };
             users[existingIndex] = updatedUser;
             saveUsers(users);
-            console.log('Synced Ali Rooshan user with latest demo data');
         }
     }
 };
