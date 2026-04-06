@@ -28,20 +28,26 @@ const ManageScholarships = () => {
         setSearchParams({});
     };
 
-    const handleAddScholarship = (e) => {
+    const handleAddScholarship = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const newScholarship = {
-            id: Math.random(),
-            name: formData.get('title'),
-            amount: `${formData.get('currency')} ${formData.get('amount')}`,
-            country: formData.get('country'),
-            deadline: formData.get('deadline'),
-            tags: ["Merit-based", "International"] // Default tags
-        };
-
-        setLocalScholarships([newScholarship, ...localScholarships]);
-        handleCloseModal();
+        try {
+            await api.post('/scholarships', {
+                name: formData.get('title'),
+                amount: `${formData.get('currency')} ${formData.get('amount')}`,
+                country: formData.get('country') || 'Global',
+                deadline: formData.get('deadline'),
+                provider: formData.get('provider') || '',
+                type: 'Merit-based',
+                status: 'Check Requirements'
+            });
+            const fresh = await api.get('/scholarships');
+            setLocalScholarships(fresh);
+            handleCloseModal();
+        } catch (err) {
+            console.error('Failed to add scholarship:', err.message);
+            alert('Failed to add scholarship: ' + err.message);
+        }
     };
 
     const handleEditScholarship = (scholarship) => {
@@ -49,21 +55,26 @@ const ManageScholarships = () => {
         setIsEditModalOpen(true);
     };
 
-    const handleUpdateScholarship = (e) => {
+    const handleUpdateScholarship = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const updatedScholarships = localScholarships.map(s =>
-            s.id === editingScholarship.id ? {
-                ...s,
+        try {
+            await api.put(`/scholarships/${editingScholarship.id}`, {
                 name: formData.get('title'),
                 amount: `${formData.get('currency')} ${formData.get('amount')}`,
-                country: formData.get('country'),
-                deadline: formData.get('deadline')
-            } : s
-        );
-        setLocalScholarships(updatedScholarships);
-        setIsEditModalOpen(false);
-        setEditingScholarship(null);
+                country: formData.get('country') || editingScholarship.country,
+                deadline: formData.get('deadline'),
+                provider: editingScholarship.provider || '',
+                type: editingScholarship.type || 'Merit-based',
+                status: editingScholarship.status || 'Check Requirements'
+            });
+            const fresh = await api.get('/scholarships');
+            setLocalScholarships(fresh);
+            setIsEditModalOpen(false); setEditingScholarship(null);
+        } catch (err) {
+            console.error('Failed to update scholarship:', err.message);
+            alert('Failed to update scholarship: ' + err.message);
+        }
     };
 
     return (

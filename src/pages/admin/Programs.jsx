@@ -47,21 +47,30 @@ const ManagePrograms = () => {
         setSearchParams({}); // Clear query params
     };
 
-    const handleAddProgram = (e) => {
+    const handleAddProgram = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const newProgram = {
-            id: Math.random(), // Temporary ID
-            name: formData.get('programName'),
-            universityName: formData.get('university'),
-            location: formData.get('country'),
-            uniImage: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f', // Placeholder
-            fees: `$${formData.get('tuition')}`,
-            duration: '2 Years'
-        };
-
-        setLocalPrograms([newProgram, ...localPrograms]);
-        handleCloseModal();
+        try {
+            await api.post('/programs', {
+                program: formData.get('programName'),
+                university: formData.get('university'),
+                country: formData.get('country'),
+                tuition: Number(formData.get('tuition')),
+                currency: '$',
+                duration: '2 Years'
+            });
+            const fresh = await api.get('/programs');
+            const mapped = fresh.map(item => ({
+                id: item.id, name: item.program, universityName: item.university,
+                location: item.country, uniImage: item.logo || item.image,
+                fees: `${item.currency}${Number(item.tuition).toLocaleString()}`, duration: item.duration || '2 Years'
+            }));
+            setAllPrograms(mapped); setLocalPrograms(mapped);
+            handleCloseModal();
+        } catch (err) {
+            console.error('Failed to add program:', err.message);
+            alert('Failed to add program: ' + err.message);
+        }
     };
 
     const handleEditProgram = (prog) => {
@@ -70,27 +79,42 @@ const ManagePrograms = () => {
         setOpenMenuId(null);
     };
 
-    const handleUpdateProgram = (e) => {
+    const handleUpdateProgram = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const updatedPrograms = localPrograms.map(p =>
-            p.id === editingProgram.id ? {
-                ...p,
-                name: formData.get('programName'),
-                universityName: formData.get('university'),
-                location: formData.get('country'),
-                fees: `$${formData.get('tuition')}`
-            } : p
-        );
-        setLocalPrograms(updatedPrograms);
-        setIsEditModalOpen(false);
-        setEditingProgram(null);
+        try {
+            await api.put(`/programs/${editingProgram.id}`, {
+                program: formData.get('programName'),
+                university: formData.get('university'),
+                country: formData.get('country'),
+                tuition: Number(formData.get('tuition')),
+                currency: '$',
+                duration: editingProgram.duration || '2 Years'
+            });
+            const fresh = await api.get('/programs');
+            const mapped = fresh.map(item => ({
+                id: item.id, name: item.program, universityName: item.university,
+                location: item.country, uniImage: item.logo || item.image,
+                fees: `${item.currency}${Number(item.tuition).toLocaleString()}`, duration: item.duration || '2 Years'
+            }));
+            setAllPrograms(mapped); setLocalPrograms(mapped);
+            setIsEditModalOpen(false); setEditingProgram(null);
+        } catch (err) {
+            console.error('Failed to update program:', err.message);
+            alert('Failed to update program: ' + err.message);
+        }
     };
 
-    const handleDeleteProgram = (id) => {
-        setLocalPrograms(localPrograms.filter(p => p.id !== id));
-        setDeleteConfirmId(null);
-        setOpenMenuId(null);
+    const handleDeleteProgram = async (id) => {
+        try {
+            await api.delete(`/programs/${id}`);
+            setLocalPrograms(prev => prev.filter(p => p.id !== id));
+            setAllPrograms(prev => prev.filter(p => p.id !== id));
+            setDeleteConfirmId(null); setOpenMenuId(null);
+        } catch (err) {
+            console.error('Failed to delete program:', err.message);
+            alert('Failed to delete program: ' + err.message);
+        }
     };
 
     const countries = ['All', ...new Set(allPrograms.map(p => p.location))];

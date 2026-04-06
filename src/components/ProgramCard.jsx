@@ -23,6 +23,14 @@ const ProgramCard = ({ program, isGuest = false, isSaved = false, onToggleSave }
         if (onToggleSave) onToggleSave(program);
     };
 
+    const formatDate = (dateString) => {
+        if (!dateString) return 'TBA';
+        if (dateString.includes('T')) {
+            return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+        return dateString;
+    };
+
     return (
         <div className="rounded-2xl overflow-hidden group flex flex-col h-full card-hover relative transition-all duration-300 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-2 border-indigo-100 shadow-md hover:shadow-xl">
             <div className="relative h-48 overflow-hidden bg-slate-100">
@@ -42,10 +50,12 @@ const ProgramCard = ({ program, isGuest = false, isSaved = false, onToggleSave }
                     </div>
                 )}
 
-                <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-900 shadow-lg flex items-center gap-1 z-20 border-2 border-amber-200">
-                    <Star size={12} className="text-amber-500 fill-amber-500" />
-                    {program.matchScore}% Match
-                </div>
+                {!isGuest && (
+                    <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-900 shadow-lg flex items-center gap-1 z-20 border-2 border-amber-200">
+                        <Star size={12} className="text-amber-500 fill-amber-500" />
+                        {program.matchScore}% Match
+                    </div>
+                )}
 
                 {!isGuest && (
                     <button
@@ -82,7 +92,7 @@ const ProgramCard = ({ program, isGuest = false, isSaved = false, onToggleSave }
                 <div className="mt-auto pt-4 border-t-2 border-indigo-200 flex items-center justify-between">
                     <div className="flex items-center gap-2 text-amber-600 text-xs font-bold uppercase tracking-wider">
                         <Calendar size={14} />
-                        <span>{program.deadline}</span>
+                        <span>{formatDate(program.deadline)}</span>
                     </div>
                     <button
                         onClick={handleDetailsClick}

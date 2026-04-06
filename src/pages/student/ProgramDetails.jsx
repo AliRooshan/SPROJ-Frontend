@@ -52,6 +52,13 @@ const ProgramDetails = () => {
         }
     };
 
+    const formatDate = (dateString) => {
+        if (!dateString) return 'TBA';
+        if (dateString.includes('T')) {
+            return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+        return dateString;
+    };
 
     if (!program) return <div className="p-12 text-center text-slate-500 font-bold animate-pulse">Loading program details...</div>;
 
@@ -123,7 +130,7 @@ const ProgramDetails = () => {
                                 <span className="block text-slate-500 text-xs font-bold uppercase mb-1">Intake</span>
                                 <span className="text-lg font-black text-slate-900 flex items-center gap-2">
                                     <Calendar size={18} className="text-indigo-500" />
-                                    {program.deadline}
+                                    {formatDate(program.deadline)}
                                 </span>
                             </div>
                         </div>

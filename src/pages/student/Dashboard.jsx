@@ -4,12 +4,14 @@ import { Clock, Search, Sparkles, BookmarkCheck, Target, Award, ArrowRight, Grad
 import ProgramCard from '../../components/ProgramCard';
 import DocumentChecklist from '../../components/DocumentChecklist';
 import AuthService from '../../services/AuthService';
+import api from '../../services/api';
 
 const StudentDashboard = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState({ fullName: 'Student', stats: { saved: 0, pending: 0, accepted: 0 } });
     const [savedPrograms, setSavedPrograms] = useState([]);
     const [savedScholarships, setSavedScholarships] = useState([]);
+    const [costPreview, setCostPreview] = useState(null);
 
     useEffect(() => {
         const currentUser = AuthService.getCurrentUser();
@@ -20,6 +22,10 @@ const StudentDashboard = () => {
         } else {
             navigate('/login');
         }
+        // Fetch first city for the cost preview widget
+        api.get('/costs').then(data => {
+            if (data && data.length > 0) setCostPreview(data[0]);
+        }).catch(() => {});
     }, [navigate]);
 
     const deadlines = user.deadlines || [];
@@ -318,37 +324,41 @@ const StudentDashboard = () => {
                                 </div>
                             </div>
 
-                            <div>
-                                <div className="text-5xl font-black text-white tracking-tighter mb-1 drop-shadow-lg">
-                                    GBP 1,320
-                                </div>
-                                <p className="text-indigo-200 font-medium text-sm">for <span className="text-white border-b-2 border-indigo-400 pb-0.5">London</span></p>
-                            </div>
-
-                            <div className="space-y-2.5 pt-1">
-                                {/* Breakdown Items */}
-                                <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-indigo-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Home size={16} className="text-indigo-300" /></div>
-                                        <span className="text-xs text-indigo-100 font-bold">Accommodation</span>
+                            {costPreview ? (
+                            <>
+                                <div>
+                                    <div className="text-5xl font-black text-white tracking-tighter mb-1 drop-shadow-lg">
+                                        {costPreview.currency} {(costPreview.rent + costPreview.food + costPreview.transport).toLocaleString()}
                                     </div>
-                                    <span className="text-sm font-bold text-white tracking-tight">GBP 960</span>
+                                    <p className="text-indigo-200 font-medium text-sm">for <span className="text-white border-b-2 border-indigo-400 pb-0.5">{costPreview.city}</span></p>
                                 </div>
-                                <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-emerald-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Coffee size={16} className="text-emerald-300" /></div>
-                                        <span className="text-xs text-indigo-100 font-bold">Food & Groceries</span>
+                                <div className="space-y-2.5 pt-1">
+                                    <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-indigo-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Home size={16} className="text-indigo-300" /></div>
+                                            <span className="text-xs text-indigo-100 font-bold">Accommodation</span>
+                                        </div>
+                                        <span className="text-sm font-bold text-white tracking-tight">{costPreview.currency} {Number(costPreview.rent).toLocaleString()}</span>
                                     </div>
-                                    <span className="text-sm font-bold text-white tracking-tight">GBP 240</span>
-                                </div>
-                                <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-amber-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Bus size={16} className="text-amber-300" /></div>
-                                        <span className="text-xs text-indigo-100 font-bold">Transport</span>
+                                    <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-emerald-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Coffee size={16} className="text-emerald-300" /></div>
+                                            <span className="text-xs text-indigo-100 font-bold">Food & Groceries</span>
+                                        </div>
+                                        <span className="text-sm font-bold text-white tracking-tight">{costPreview.currency} {Number(costPreview.food).toLocaleString()}</span>
                                     </div>
-                                    <span className="text-sm font-bold text-white tracking-tight">GBP 120</span>
+                                    <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-amber-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Bus size={16} className="text-amber-300" /></div>
+                                            <span className="text-xs text-indigo-100 font-bold">Transport</span>
+                                        </div>
+                                        <span className="text-sm font-bold text-white tracking-tight">{costPreview.currency} {Number(costPreview.transport).toLocaleString()}</span>
+                                    </div>
                                 </div>
-                            </div>
+                            </>
+                            ) : (
+                                <p className="text-indigo-300 text-sm font-medium animate-pulse">Loading cost data...</p>
+                            )}
                         </div>
                     </div>
 

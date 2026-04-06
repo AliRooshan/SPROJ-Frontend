@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, BookOpen, GraduationCap, DollarSign, Calendar, Activity, Bell, X } from 'lucide-react';
+import { Users, BookOpen, GraduationCap, DollarSign, Calendar, Activity, Bell, X, TrendingUp } from 'lucide-react';
+import api from '../../services/api';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const [showNotifications, setShowNotifications] = useState(false);
     const [engagementPeriod, setEngagementPeriod] = useState('7days');
+    const [stats, setStats] = useState([
+        { label: 'Total Programs', value: '—', change: '', icon: BookOpen, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+        { label: 'Scholarships', value: '—', change: '', icon: GraduationCap, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+        { label: 'Cost Entries', value: '—', change: '', icon: DollarSign, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+        { label: 'System Status', value: 'Live', change: 'Stable', icon: Activity, color: 'text-rose-400', bg: 'bg-rose-500/10' },
+    ]);
 
-    // Mock Data
-    const stats = [
-        { label: 'Total Students', value: '2,543', change: '+12.5%', icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-        { label: 'Programs Active', value: '856', change: '+3.2%', icon: BookOpen, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-        { label: 'Scholarships', value: '42', change: 'New', icon: GraduationCap, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-        { label: 'System Load', value: '98%', change: 'Stable', icon: Activity, color: 'text-rose-400', bg: 'bg-rose-500/10' },
-    ];
-
+    // Static notifications (no dedicated notifications API yet)
     const notifications = [
         { id: 1, title: 'New Application Submitted', message: '5 new applications pending review', time: '2 hours ago', type: 'info' },
         { id: 2, title: 'Scholarship Deadline Approaching', message: 'DAAD Scholarship deadline in 3 days', time: '5 hours ago', type: 'warning' },
@@ -23,18 +23,52 @@ const AdminDashboard = () => {
         { id: 5, title: 'Exchange Rate Updated', message: 'USD exchange rate updated', time: '3 days ago', type: 'info' },
     ];
 
-    // Chart data based on period
+    // Chart data based on period (engagement is presentational — no API endpoint yet)
     const chartData = {
         '7days': [40, 65, 45, 80, 55, 90, 70],
         '30days': [40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 50, 95, 65, 70, 80, 60, 75, 85, 55, 90, 70, 80, 65, 75, 60, 85, 70, 80, 75, 90]
     };
-
 
     const quickActions = [
         { label: 'Add New Program', icon: BookOpen, path: '/admin/programs?action=add' },
         { label: 'Post Scholarship', icon: GraduationCap, path: '/admin/scholarships?action=add' },
         { label: 'Update Exchange Rates', icon: DollarSign, path: '/admin/costs' },
     ];
+
+    useEffect(() => {
+        // Fetch real counts from the database
+        Promise.allSettled([
+            api.get('/programs'),
+            api.get('/scholarships'),
+            api.get('/costs'),
+        ]).then(([programs, scholarships, costs]) => {
+            setStats([
+                {
+                    label: 'Total Programs',
+                    value: programs.status === 'fulfilled' ? programs.value.length.toLocaleString() : '—',
+                    change: programs.status === 'fulfilled' ? 'In DB' : 'Error',
+                    icon: BookOpen, color: 'text-amber-400', bg: 'bg-amber-500/10'
+                },
+                {
+                    label: 'Scholarships',
+                    value: scholarships.status === 'fulfilled' ? scholarships.value.length.toLocaleString() : '—',
+                    change: scholarships.status === 'fulfilled' ? 'In DB' : 'Error',
+                    icon: GraduationCap, color: 'text-emerald-400', bg: 'bg-emerald-500/10'
+                },
+                {
+                    label: 'Cost Entries',
+                    value: costs.status === 'fulfilled' ? costs.value.length.toLocaleString() : '—',
+                    change: costs.status === 'fulfilled' ? 'Cities' : 'Error',
+                    icon: DollarSign, color: 'text-blue-400', bg: 'bg-blue-500/10'
+                },
+                {
+                    label: 'System Status',
+                    value: 'Live', change: 'Stable',
+                    icon: Activity, color: 'text-rose-400', bg: 'bg-rose-500/10'
+                },
+            ]);
+        });
+    }, []);
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
@@ -102,7 +136,7 @@ const AdminDashboard = () => {
                 </div>
             </div>
 
-            {/* Stats Grid - High Contrast & Warm */}
+            {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat, idx) => (
                     <div key={idx} className="bg-[#18181b] p-6 rounded-[1.5rem] border border-zinc-800 shadow-sm hover:border-zinc-700 hover:shadow-lg transition-all group">
@@ -123,7 +157,7 @@ const AdminDashboard = () => {
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">
-                {/* Main Content Area - e.g. Chart Placeholder */}
+                {/* Engagement Chart */}
                 <div className="lg:col-span-2 bg-[#18181b] rounded-[2rem] border border-zinc-800 p-8 shadow-sm h-[400px] flex flex-col relative overflow-hidden group">
                     <div className="flex justify-between items-center mb-6 relative z-10">
                         <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -140,41 +174,38 @@ const AdminDashboard = () => {
                         </select>
                     </div>
 
-                    {/* Placeholder Chart Lines */}
+                    {/* Chart */}
                     <div className="flex-1 flex items-end gap-2 px-2 pb-2 relative z-10 opacity-80">
                         {chartData[engagementPeriod].map((h, i) => (
                             <div key={i} className="flex-1 bg-gradient-to-t from-zinc-800 to-amber-500/80 rounded-t-lg hover:to-amber-400 transition-all duration-500 group-hover:scale-y-105 origin-bottom" style={{ height: `${h}%` }}></div>
                         ))}
                     </div>
 
-                    {/* Background Glow */}
                     <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none"></div>
                 </div>
 
-                {/* Quick Actions & Recent */}
+                {/* Quick Actions */}
                 <div className="space-y-6">
                     <div className="bg-[#18181b] rounded-[2rem] border border-zinc-800 p-6 shadow-sm">
                         <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
                         <div className="space-y-3">
-                            <div className="space-y-3">
-                                {quickActions.map((action, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => navigate(action.path)}
-                                        className="w-full p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-amber-500/50 hover:bg-zinc-800 transition-all group flex items-center justify-between"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-zinc-800 text-zinc-400 group-hover:text-amber-500 group-hover:bg-amber-500/10 transition-colors">
-                                                <action.icon size={18} />
-                                            </div>
-                                            <span className="font-bold text-zinc-300 group-hover:text-white text-sm">{action.label}</span>
+                            {quickActions.map((action, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => navigate(action.path)}
+                                    className="w-full p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-amber-500/50 hover:bg-zinc-800 transition-all group flex items-center justify-between"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-zinc-800 text-zinc-400 group-hover:text-amber-500 group-hover:bg-amber-500/10 transition-colors">
+                                            <action.icon size={18} />
                                         </div>
-                                        <div className="w-8 h-8 rounded-full border border-zinc-700 flex items-center justify-center text-zinc-500 group-hover:border-amber-500/50 group-hover:text-amber-500 text-xs font-bold bg-zinc-800">
-                                            +
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
+                                        <span className="font-bold text-zinc-300 group-hover:text-white text-sm">{action.label}</span>
+                                    </div>
+                                    <div className="w-8 h-8 rounded-full border border-zinc-700 flex items-center justify-center text-zinc-500 group-hover:border-amber-500/50 group-hover:text-amber-500 text-xs font-bold bg-zinc-800">
+                                        +
+                                    </div>
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>

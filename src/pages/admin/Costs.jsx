@@ -12,19 +12,39 @@ const ManageCosts = () => {
             .catch(console.error);
     }, []);
 
-    const handleAddExchangeRate = (e) => {
+    const handleAddExchangeRate = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const newCity = {
-            city: formData.get('city'),
-            country: formData.get('country'),
-            currency: formData.get('currency'),
-            rent: parseInt(formData.get('rent')),
-            food: parseInt(formData.get('food')),
-            transport: parseInt(formData.get('transport'))
-        };
-        setCities([...cities, newCity]);
-        setIsModalOpen(false);
+        try {
+            await api.post('/costs', {
+                city: formData.get('city'),
+                country: formData.get('country'),
+                currency: formData.get('currency'),
+                rent: parseInt(formData.get('rent')),
+                food: parseInt(formData.get('food')),
+                transport: parseInt(formData.get('transport'))
+            });
+            const fresh = await api.get('/costs');
+            setCities(fresh);
+            setIsModalOpen(false);
+        } catch (err) {
+            console.error('Failed to add city:', err.message);
+            alert('Failed to add city: ' + err.message);
+        }
+    };
+
+    const handleSaveCity = async (city, rent, food, transport) => {
+        try {
+            await api.put(`/costs/${city.id}`, {
+                city: city.city, country: city.country, currency: city.currency,
+                rent: Number(rent), food: Number(food), transport: Number(transport)
+            });
+            const fresh = await api.get('/costs');
+            setCities(fresh);
+        } catch (err) {
+            console.error('Failed to save city:', err.message);
+            alert('Failed to save: ' + err.message);
+        }
     };
 
     return (
@@ -65,8 +85,11 @@ const ManageCosts = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-800">
-                            {cities.map((city, idx) => (
-                                <tr key={idx} className="group hover:bg-zinc-800/50 transition-colors">
+                            {cities.map((city, idx) => {
+                                // Use local DOM refs via data attributes for simplicity
+                                const rowId = city.id || idx;
+                                return (
+                                <tr key={rowId} id={`row-${rowId}`} className="group hover:bg-zinc-800/50 transition-colors">
                                     <td className="p-6">
                                         <div className="flex items-center gap-3">
                                             <div className="p-2 bg-zinc-800 rounded-lg text-amber-500 group-hover:text-amber-400">
@@ -81,31 +104,37 @@ const ManageCosts = () => {
                                     <td className="p-6">
                                         <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 w-32 focus-within:border-amber-500 transition-colors">
                                             <span className="text-zinc-500 text-xs font-bold">{city.currency}</span>
-                                            <input type="number" defaultValue={city.rent} className="bg-transparent text-white font-mono w-full outline-none" />
+                                            <input id={`rent-${rowId}`} type="number" defaultValue={city.rent} className="bg-transparent text-white font-mono w-full outline-none" />
                                         </div>
                                     </td>
                                     <td className="p-6">
                                         <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 w-32 focus-within:border-amber-500 transition-colors">
                                             <span className="text-zinc-500 text-xs font-bold">{city.currency}</span>
-                                            <input type="number" defaultValue={city.food} className="bg-transparent text-white font-mono w-full outline-none" />
+                                            <input id={`food-${rowId}`} type="number" defaultValue={city.food} className="bg-transparent text-white font-mono w-full outline-none" />
                                         </div>
                                     </td>
                                     <td className="p-6">
                                         <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 w-32 focus-within:border-amber-500 transition-colors">
                                             <span className="text-zinc-500 text-xs font-bold">{city.currency}</span>
-                                            <input type="number" defaultValue={city.transport} className="bg-transparent text-white font-mono w-full outline-none" />
+                                            <input id={`transport-${rowId}`} type="number" defaultValue={city.transport} className="bg-transparent text-white font-mono w-full outline-none" />
                                         </div>
                                     </td>
                                     <td className="p-6 text-right">
                                         <button
-                                            onClick={() => alert(`Saved costs for ${city.city}!`)}
+                                            onClick={() => {
+                                                const rent = document.getElementById(`rent-${rowId}`)?.value;
+                                                const food = document.getElementById(`food-${rowId}`)?.value;
+                                                const transport = document.getElementById(`transport-${rowId}`)?.value;
+                                                handleSaveCity(city, rent, food, transport);
+                                            }}
                                             className="p-2.5 bg-amber-500 hover:bg-amber-400 text-black rounded-lg transition-colors shadow-lg shadow-amber-900/20 active:scale-95"
                                         >
                                             <Save size={18} />
                                         </button>
                                     </td>
                                 </tr>
-                            ))}
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
