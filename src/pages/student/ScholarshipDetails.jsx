@@ -86,10 +86,12 @@ const ScholarshipDetails = () => {
                             </div>
                             <h2 className="text-3xl font-black text-slate-900">About the Scholarship</h2>
                         </div>
-                        <p className="text-slate-600 leading-relaxed text-lg font-medium">
-                            The <span className="text-emerald-700 font-bold">{scholarship.name}</span> is a prestigious award designed to support outstanding students in their academic journey.
-                            Wait, this is mock data, but imagine a beautiful description here about how this scholarship empowers future leaders in {scholarship.country}.
-                        </p>
+                        <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 flex gap-3 items-center">
+                            <Award size={20} className="text-emerald-600 shrink-0" />
+                            <p className="text-slate-700 font-medium text-base leading-relaxed">
+                                <span className="font-black text-emerald-700">{scholarship.name}</span> — provided by <span className="font-bold">{scholarship.provider}</span>. Award value: <span className="font-bold">{scholarship.amount}</span>. Application deadline: <span className="font-bold">{scholarship.deadline}</span>.
+                            </p>
+                        </div>
 
                         <div className="grid grid-cols-2 gap-6 pt-2">
                             <div className="p-6 rounded-3xl bg-white border border-emerald-50 shadow-sm group hover:border-emerald-200 transition-colors">
@@ -109,30 +111,7 @@ const ScholarshipDetails = () => {
                         </div>
                     </div>
 
-                    {/* Eligibility & Requirements */}
-                    <div className="glass-card p-10 rounded-[2.5rem] border border-white/50 shadow-xl bg-white/60 space-y-8 backdrop-blur-xl">
-                        <div className="flex items-center gap-4 border-b border-emerald-100/50 pb-6">
-                            <div className="p-3 bg-blue-100 rounded-2xl text-blue-600 shadow-sm">
-                                <CheckCircle size={28} />
-                            </div>
-                            <h2 className="text-3xl font-black text-slate-900">Eligibility & Requirements</h2>
-                        </div>
-                        <ul className="space-y-4">
-                            {[
-                                "Must be an international student from a qualifying country.",
-                                "A strong academic record (GPA 3.5+ or equivalent).",
-                                "Demonstrated leadership potential and community service.",
-                                "Proficiency in English (IELTS/TOEFL) required for non-native speakers."
-                            ].map((req, idx) => (
-                                <li key={idx} className="flex items-start gap-4 text-slate-700 bg-white p-5 rounded-2xl border border-slate-100 hover:border-emerald-100 transition-colors shadow-sm">
-                                    <div className="mt-1 p-1 bg-emerald-100 rounded-full text-emerald-600">
-                                        <CheckCircle size={16} strokeWidth={3} />
-                                    </div>
-                                    <span className="font-bold text-lg">{req}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+
                 </div>
 
                 {/* Sidebar */}

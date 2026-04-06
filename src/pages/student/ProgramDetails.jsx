@@ -115,7 +115,7 @@ const ProgramDetails = () => {
                             <h2 className="text-2xl font-black text-slate-900">Program Overview</h2>
                         </div>
                         <p className="text-slate-600 leading-relaxed text-lg">
-                            {program.description} This comprehensive program is designed to equip students with the theoretical knowledge and practical skills necessary to excel in the competitive global market. Through a blend of rigorous coursework and hands-on projects, you will tackle real-world challenges.
+                            {program.description || 'No description available.'}
                         </p>
 
                         <div className="grid grid-cols-2 gap-4 pt-4">
@@ -144,19 +144,18 @@ const ProgramDetails = () => {
                             </div>
                             <h2 className="text-2xl font-black text-slate-900">Eligibility Criteria</h2>
                         </div>
-                        <ul className="space-y-4">
-                            {[
-                                program.eligibility,
-                                "Bachelor's degree in a relevant field with minimum 60% aggregate.",
-                                "Minimum 2 years of relevant work experience recommended.",
-                                "English Proficiency: IELTS 6.5 or TOEFL 90."
-                            ].map((req, idx) => (
-                                <li key={idx} className="flex items-start gap-4 text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                    <CheckCircle className="text-emerald-500 shrink-0 mt-0.5" size={20} />
-                                    <span className="font-medium">{req}</span>
-                                </li>
-                            ))}
-                        </ul>
+                        {program.eligibility ? (
+                            <ul className="space-y-4">
+                                {program.eligibility.split('\n').filter(Boolean).map((req, idx) => (
+                                    <li key={idx} className="flex items-start gap-4 text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                        <CheckCircle className="text-emerald-500 shrink-0 mt-0.5" size={20} />
+                                        <span className="font-medium">{req}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="text-slate-500 font-medium italic">No eligibility criteria specified.</p>
+                        )}
                     </div>
                 </div>
 

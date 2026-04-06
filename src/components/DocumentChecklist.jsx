@@ -4,23 +4,16 @@ import { useNavigate } from 'react-router-dom';
 
 const DocumentChecklist = ({ compact = false }) => {
     const navigate = useNavigate();
-    const [documents, setDocuments] = useState([
-        { id: 1, name: 'Passport Copy', status: 'completed' },
-        { id: 2, name: 'Academic Transcripts', status: 'completed' },
-        { id: 3, name: 'Statement of Purpose', status: 'pending' },
-        { id: 4, name: 'Letters of Recommendation', status: 'pending' },
-        { id: 5, name: 'IELTS/TOEFL Score', status: 'completed' },
-        { id: 6, name: 'CV / Resume', status: 'completed' },
-        { id: 7, name: 'Financial Proof', status: 'pending' },
-    ]);
-
-    const toggleStatus = (id) => {
-        setDocuments(documents.map(doc =>
-            doc.id === id
-                ? { ...doc, status: doc.status === 'completed' ? 'pending' : 'completed' }
-                : doc
-        ));
-    };
+    // Static list of expected documents
+    const documents = [
+        { id: 1, name: 'Passport Copy' },
+        { id: 2, name: 'Academic Transcripts' },
+        { id: 3, name: 'Statement of Purpose' },
+        { id: 4, name: 'Letters of Recommendation' },
+        { id: 5, name: 'IELTS/TOEFL Score' },
+        { id: 6, name: 'CV / Resume' },
+        { id: 7, name: 'Financial Proof' },
+    ];
 
     const displayDocs = compact ? documents.slice(0, 4) : documents;
 
@@ -34,15 +27,11 @@ const DocumentChecklist = ({ compact = false }) => {
                 {displayDocs.map((doc) => (
                     <div
                         key={doc.id}
-                        className="flex items-center justify-between p-2 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
-                        onClick={() => toggleStatus(doc.id)}
+                        className="flex items-center justify-between p-2 hover:bg-slate-50 rounded-lg transition-colors cursor-default"
                     >
                         <div className="flex items-center gap-3">
-                            {doc.status === 'completed'
-                                ? <CheckCircle className="text-green-500" size={20} />
-                                : <Circle className="text-slate-300" size={20} />
-                            }
-                            <span className={`${doc.status === 'completed' ? 'text-slate-500 line-through' : 'text-slate-700 font-medium'}`}>
+                            <Circle className="text-slate-300" size={20} />
+                            <span className="text-slate-700 font-medium">
                                 {doc.name}
                             </span>
                         </div>

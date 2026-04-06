@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { User, Bell, Shield, Key, Save, Upload, Lock, Mail } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Bell, Shield, Key, Save, Lock, Mail } from 'lucide-react';
+import AuthService from '../../services/AuthService';
 
 const AdminSettings = () => {
     const [activeTab, setActiveTab] = useState('profile');
-    const [avatarUrl, setAvatarUrl] = useState('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop');
+    const [adminUser, setAdminUser] = useState({ fullName: 'Admin', email: 'admin@voyage.com' });
     const [notifications, setNotifications] = useState({
         emailAlerts: true,
         newApplications: true,
@@ -11,18 +12,12 @@ const AdminSettings = () => {
         weeklyReports: true
     });
 
-    const handleAvatarChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            // Create a local URL for the selected image
-            const imageUrl = URL.createObjectURL(file);
-            setAvatarUrl(imageUrl);
+    useEffect(() => {
+        const currentUser = AuthService.getCurrentUser();
+        if (currentUser) {
+            setAdminUser(currentUser);
         }
-    };
-
-    const triggerFileInput = () => {
-        document.getElementById('avatar-upload').click();
-    };
+    }, []);
 
     const handleNotificationToggle = (key) => {
         setNotifications(prev => ({
@@ -68,33 +63,14 @@ const AdminSettings = () => {
                         <>
                             {/* Avatar Section */}
                             <div className="flex items-center gap-6 pb-8 border-b border-zinc-800">
-                                <div className="w-24 h-24 rounded-full bg-zinc-800 border-2 border-amber-500/50 p-1">
-                                    <img
-                                        src={avatarUrl}
-                                        alt="Admin"
-                                        className="w-full h-full rounded-full object-cover"
-                                        onError={(e) => {
-                                            e.target.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop';
-                                        }}
-                                    />
+                                <div className="w-24 h-24 rounded-full bg-amber-500 border-2 border-amber-500/50 flex items-center justify-center">
+                                    <span className="text-4xl font-black text-black">
+                                        {adminUser.fullName ? adminUser.fullName.charAt(0).toUpperCase() : 'A'}
+                                    </span>
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold text-white">Admin User</h3>
+                                    <h3 className="text-xl font-bold text-white">{adminUser.fullName}</h3>
                                     <p className="text-zinc-500 text-sm mb-3">Super Administrator</p>
-                                    <input
-                                        type="file"
-                                        id="avatar-upload"
-                                        accept="image/*"
-                                        onChange={handleAvatarChange}
-                                        className="hidden"
-                                    />
-                                    <button
-                                        onClick={triggerFileInput}
-                                        className="text-xs font-bold bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg transition-colors border border-zinc-700 flex items-center gap-2"
-                                    >
-                                        <Upload size={14} />
-                                        Change Avatar
-                                    </button>
                                 </div>
                             </div>
 
@@ -104,14 +80,14 @@ const AdminSettings = () => {
                                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Full Name</label>
                                     <div className="relative">
                                         <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-                                        <input type="text" defaultValue="Admin User" className="w-full pl-11 pr-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-white font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
+                                        <input type="text" defaultValue={adminUser.fullName} className="w-full pl-11 pr-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-white font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Email Address</label>
                                     <div className="relative">
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-                                        <input type="email" defaultValue="admin@voyage.com" className="w-full pl-11 pr-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-white font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
+                                        <input type="email" defaultValue={adminUser.email} className="w-full pl-11 pr-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-white font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">

@@ -8,27 +8,58 @@ import api from '../../services/api';
 
 const StudentDashboard = () => {
     const navigate = useNavigate();
-    const [user, setUser] = useState({ fullName: 'Student', stats: { saved: 0, pending: 0, accepted: 0 } });
+    const [user, setUser] = useState({ fullName: 'Student' });
     const [savedPrograms, setSavedPrograms] = useState([]);
     const [savedScholarships, setSavedScholarships] = useState([]);
+    const [applications, setApplications] = useState([]);
     const [costPreview, setCostPreview] = useState(null);
 
     useEffect(() => {
         const currentUser = AuthService.getCurrentUser();
         if (currentUser) {
             setUser(currentUser);
-            setSavedPrograms(currentUser.savedPrograms || []);
-            setSavedScholarships(currentUser.savedScholarships || []);
+            // Fetch live user data
+            Promise.allSettled([
+                api.get(`/users/${currentUser.id}/saved-programs`),
+                api.get(`/users/${currentUser.id}/saved-scholarships`),
+                api.get(`/users/${currentUser.id}/applications`)
+            ]).then(([programsRes, scholarshipsRes, appsRes]) => {
+                const programs = programsRes.status === 'fulfilled' ? programsRes.value : [];
+                const scholarships = scholarshipsRes.status === 'fulfilled' ? scholarshipsRes.value : [];
+                const apps = appsRes.status === 'fulfilled' ? appsRes.value : [];
+
+                // Filter out nulls from the backend joined responses if any
+                setSavedPrograms(programs.filter(p => p !== null));
+                setSavedScholarships(scholarships.filter(s => s !== null));
+                setApplications(apps);
+            });
         } else {
             navigate('/login');
         }
         // Fetch first city for the cost preview widget
         api.get('/costs').then(data => {
             if (data && data.length > 0) setCostPreview(data[0]);
-        }).catch(() => {});
+        }).catch(() => { });
     }, [navigate]);
 
-    const deadlines = user.deadlines || [];
+    // Derive stats
+    const stats = {
+        saved: savedPrograms.length + savedScholarships.length,
+        pending: applications.filter(a => a.status === 'pending').length,
+        accepted: applications.filter(a => a.status === 'accepted').length
+    };
+
+    // Derive deadlines from pending apps
+    const deadlines = applications
+        .filter(a => a.status === 'pending' && a.deadline)
+        .map(a => ({
+            id: a.id,
+            university: a.university,
+            title: a.program_name || a.program,
+            date: a.deadline,
+            type: 'Application'
+        }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
     const firstName = user.fullName ? user.fullName.split(' ')[0] : 'Student';
 
     return (
@@ -101,7 +132,7 @@ const StudentDashboard = () => {
                                 </span>
                             </div>
                             <div className="text-5xl font-black text-slate-800 tracking-tighter mb-1 group-hover:text-indigo-600 transition-colors">
-                                {user.stats?.saved || 0}
+                                {stats.saved}
                             </div>
                             <p className="text-slate-500 font-medium text-sm">Programs shortlisted</p>
                         </div>
@@ -117,7 +148,7 @@ const StudentDashboard = () => {
                                 </span>
                             </div>
                             <div className="text-5xl font-black text-slate-800 tracking-tighter mb-1 group-hover:text-amber-600 transition-colors">
-                                {user.stats?.pending || 0}
+                                {stats.pending}
                             </div>
                             <p className="text-slate-500 font-medium text-sm">Applications in progress</p>
                         </div>
@@ -133,7 +164,7 @@ const StudentDashboard = () => {
                                 </span>
                             </div>
                             <div className="text-5xl font-black text-slate-800 tracking-tighter mb-1 group-hover:text-emerald-600 transition-colors">
-                                {user.stats?.accepted || 0}
+                                {stats.accepted}
                             </div>
                             <p className="text-slate-500 font-medium text-sm">Offers received</p>
                         </div>
@@ -325,37 +356,37 @@ const StudentDashboard = () => {
                             </div>
 
                             {costPreview ? (
-                            <>
-                                <div>
-                                    <div className="text-5xl font-black text-white tracking-tighter mb-1 drop-shadow-lg">
-                                        {costPreview.currency} {(costPreview.rent + costPreview.food + costPreview.transport).toLocaleString()}
-                                    </div>
-                                    <p className="text-indigo-200 font-medium text-sm">for <span className="text-white border-b-2 border-indigo-400 pb-0.5">{costPreview.city}</span></p>
-                                </div>
-                                <div className="space-y-2.5 pt-1">
-                                    <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-indigo-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Home size={16} className="text-indigo-300" /></div>
-                                            <span className="text-xs text-indigo-100 font-bold">Accommodation</span>
+                                <>
+                                    <div>
+                                        <div className="text-5xl font-black text-white tracking-tighter mb-1 drop-shadow-lg">
+                                            {costPreview.currency} {(costPreview.rent + costPreview.food + costPreview.transport).toLocaleString()}
                                         </div>
-                                        <span className="text-sm font-bold text-white tracking-tight">{costPreview.currency} {Number(costPreview.rent).toLocaleString()}</span>
+                                        <p className="text-indigo-200 font-medium text-sm">for <span className="text-white border-b-2 border-indigo-400 pb-0.5">{costPreview.city}</span></p>
                                     </div>
-                                    <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-emerald-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Coffee size={16} className="text-emerald-300" /></div>
-                                            <span className="text-xs text-indigo-100 font-bold">Food & Groceries</span>
+                                    <div className="space-y-2.5 pt-1">
+                                        <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-indigo-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Home size={16} className="text-indigo-300" /></div>
+                                                <span className="text-xs text-indigo-100 font-bold">Accommodation</span>
+                                            </div>
+                                            <span className="text-sm font-bold text-white tracking-tight">{costPreview.currency} {Number(costPreview.rent).toLocaleString()}</span>
                                         </div>
-                                        <span className="text-sm font-bold text-white tracking-tight">{costPreview.currency} {Number(costPreview.food).toLocaleString()}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-amber-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Bus size={16} className="text-amber-300" /></div>
-                                            <span className="text-xs text-indigo-100 font-bold">Transport</span>
+                                        <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-emerald-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Coffee size={16} className="text-emerald-300" /></div>
+                                                <span className="text-xs text-indigo-100 font-bold">Food & Groceries</span>
+                                            </div>
+                                            <span className="text-sm font-bold text-white tracking-tight">{costPreview.currency} {Number(costPreview.food).toLocaleString()}</span>
                                         </div>
-                                        <span className="text-sm font-bold text-white tracking-tight">{costPreview.currency} {Number(costPreview.transport).toLocaleString()}</span>
+                                        <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-amber-500/20 rounded-xl group-hover/item:scale-110 transition-transform"><Bus size={16} className="text-amber-300" /></div>
+                                                <span className="text-xs text-indigo-100 font-bold">Transport</span>
+                                            </div>
+                                            <span className="text-sm font-bold text-white tracking-tight">{costPreview.currency} {Number(costPreview.transport).toLocaleString()}</span>
+                                        </div>
                                     </div>
-                                </div>
-                            </>
+                                </>
                             ) : (
                                 <p className="text-indigo-300 text-sm font-medium animate-pulse">Loading cost data...</p>
                             )}

@@ -6,7 +6,6 @@ const CostEstimator = () => {
     const [costsData, setCostsData] = useState([]);
     const [selectedCity, setSelectedCity] = useState(null);
     const [lifestyle, setLifestyle] = useState('Moderate');
-    const [showPKR, setShowPKR] = useState(false);
 
     useEffect(() => {
         api.get('/costs')
@@ -22,16 +21,6 @@ const CostEstimator = () => {
     if (!cityData) return <div className="p-12 text-center text-slate-500 font-bold animate-pulse">Loading cost data...</div>;
 
 
-    const exchangeRates = {
-        'AUD': 185, 'USD': 278, 'GBP': 355, 'EUR': 305,
-        'CAD': 205, 'CHF': 315, 'SGD': 210, '€': 305, '£': 355, '$': 278
-    };
-
-    const convert = (amount, currency) => {
-        if (!showPKR) return `${currency} ${amount.toLocaleString()}`;
-        const rate = exchangeRates[currency] || exchangeRates[cityData.currency] || 250;
-        return `PKR ${(amount * rate).toLocaleString()}`;
-    };
 
     const calculateTotal = () => {
         let multiplier = 1;
@@ -148,16 +137,9 @@ const CostEstimator = () => {
                             <div className="flex items-center gap-2 text-indigo-200 font-bold uppercase tracking-widest text-[10px] border border-indigo-500/30 w-fit px-3 py-1 rounded-full bg-indigo-500/10">
                                 <Wallet size={12} /> Monthly Cost
                             </div>
-                            <button
-                                onClick={() => setShowPKR(!showPKR)}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-[10px] font-bold uppercase tracking-wider text-white border border-white/20 transition-all hover:scale-105 active:scale-95"
-                            >
-                                <DollarSign size={10} />
-                                {showPKR ? `Show in ${cityData.currency}` : 'Convert to PKR'}
-                            </button>
                         </div>
                         <div className="text-6xl md:text-7xl font-black mb-2 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-indigo-200 drop-shadow-2xl transition-all duration-500">
-                            {convert(costs.total, cityData.currency)}
+                            {cityData.currency} {costs.total.toLocaleString()}
                         </div>
                         <p className="text-indigo-200/80 font-medium text-xl">for <span className="text-white border-b-2 border-indigo-400 pb-0.5">{selectedCity}</span></p>
                     </div>
@@ -168,21 +150,21 @@ const CostEstimator = () => {
                                 <div className="p-3 bg-indigo-500/20 rounded-2xl border border-indigo-500/30 group-hover/item:scale-110 transition-transform"><Home size={20} className="text-indigo-300" /></div>
                                 <span className="text-slate-200 font-medium text-sm">Accommodation</span>
                             </div>
-                            <span className="font-bold font-mono text-xl tracking-tight">{convert(costs.rent, cityData.currency)}</span>
+                            <span className="font-bold font-mono text-xl tracking-tight">{cityData.currency} {costs.rent.toLocaleString()}</span>
                         </div>
                         <div className="flex items-center justify-between border-b border-white/5 pb-4 group/item hover:bg-white/5 rounded-xl px-2 transition-colors">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30 group-hover/item:scale-110 transition-transform"><Coffee size={20} className="text-emerald-300" /></div>
                                 <span className="text-slate-200 font-medium text-sm">Food & Groceries</span>
                             </div>
-                            <span className="font-bold font-mono text-xl tracking-tight">{convert(costs.food, cityData.currency)}</span>
+                            <span className="font-bold font-mono text-xl tracking-tight">{cityData.currency} {costs.food.toLocaleString()}</span>
                         </div>
                         <div className="flex items-center justify-between group/item hover:bg-white/5 rounded-xl px-2 pt-2 transition-colors">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-amber-500/20 rounded-2xl border border-amber-500/30 group-hover/item:scale-110 transition-transform"><Bus size={20} className="text-amber-300" /></div>
                                 <span className="text-slate-200 font-medium text-sm">Transport</span>
                             </div>
-                            <span className="font-bold font-mono text-xl tracking-tight">{convert(costs.transport, cityData.currency)}</span>
+                            <span className="font-bold font-mono text-xl tracking-tight">{cityData.currency} {costs.transport.toLocaleString()}</span>
                         </div>
                     </div>
                 </div>

@@ -64,7 +64,7 @@ const Tracker = () => {
             return (
                 <div className="flex items-center gap-2 text-xs text-emerald-700 mb-4 font-bold bg-emerald-100/80 w-fit px-3 py-1.5 rounded-lg border border-emerald-200">
                     <Calendar size={12} className="text-emerald-600" />
-                    <span>Start: <span className="text-emerald-900">Sep 2026</span></span>
+                    <span>Deadline: <span className="text-emerald-900">{app.deadline}</span></span>
                 </div>
             );
         }
