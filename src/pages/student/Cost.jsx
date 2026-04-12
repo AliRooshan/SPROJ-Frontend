@@ -109,6 +109,24 @@ const FontImport = () => (
             border-radius: 8px; padding: 4px 10px;
             font-size: 11px; font-weight: 600;
         }
+
+        .ce-main-row { display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
+        .ce-cost-left { width: 100%; flex-shrink: 0; }
+        .ce-inner-pad { padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+        .ce-chart-pad { padding: 16px 18px; gap: 14px; }
+
+        @media (min-width: 768px) {
+            .ce-main-row { flex-direction: row; gap: 20px; }
+            .ce-cost-left { width: 48%; }
+            .ce-inner-pad { padding: 24px 26px; gap: 20px; }
+            .ce-chart-pad { padding: 24px 28px; gap: 20px; }
+        }
+
+        @media (max-width: 767px) {
+            .ce-filters { padding: 10px 12px; gap: 10px; border-radius: 14px; }
+            .ce-divider { display: none; }
+            .ce-total-num { font-size: 32px; }
+        }
     `}</style>
 );
 
@@ -209,7 +227,7 @@ const CostEstimator = () => {
     ];
 
     return (
-        <div className="ce-root max-w-5xl mx-auto space-y-5 pb-12">
+        <div className="ce-root max-w-5xl mx-auto space-y-3 pb-8 md:space-y-5 md:pb-12">
             <FontImport />
 
             <PageHeader
@@ -265,11 +283,11 @@ const CostEstimator = () => {
                     <p style={{ color: '#94a3b8', fontSize: 13, fontWeight: 600 }}>Loading cost data…</p>
                 </div>
             ) : (
-                <div style={{ display: 'flex', gap: 20, alignItems: 'stretch' }}>
+                <div className="ce-main-row">
 
                     {/* ── Left: Dark summary card ── */}
-                    <div className="ce-gradient-border ce-fade1" style={{ width: '48%', flexShrink: 0 }}>
-                        <div className="ce-gradient-inner" style={{ padding: '24px 26px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+                    <div className="ce-gradient-border ce-fade1 ce-cost-left">
+                        <div className="ce-gradient-inner ce-inner-pad">
 
                             {/* Header */}
                             <div>
@@ -318,7 +336,7 @@ const CostEstimator = () => {
                     </div>
 
                     {/* ── Right: Chart card ── */}
-                    <div className="ce-card ce-fade2" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, padding: '24px 28px' }}>
+                    <div className="ce-card ce-fade2 ce-chart-pad" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 
                         {/* Donut */}
                         <div style={{ position: 'relative', width: 200 }}>

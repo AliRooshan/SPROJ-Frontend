@@ -4,7 +4,7 @@ import AuthService from '../../services/AuthService';
 import PageHeader from '../../components/PageHeader';
 import api from '../../services/api';
 
-const inputCls = "block w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 text-slate-900 text-sm font-semibold outline-none hover:border-indigo-200 transition-all";
+const inputCls = "block w-full px-3 md:px-4 py-2 md:py-2.5 bg-white border border-slate-200 rounded-lg md:rounded-xl focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 text-slate-900 text-sm font-semibold outline-none hover:border-indigo-200 transition-all";
 const selectCls = inputCls + " appearance-none cursor-pointer";
 const labelCls = "block text-[10px] font-black text-indigo-500 mb-1.5 uppercase tracking-widest";
 
@@ -103,7 +103,7 @@ const Profile = () => {
         <button
             onClick={handleSave}
             disabled={saveStatus === 'saving'}
-            className={`flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-sm transition-all shadow-md disabled:opacity-70 disabled:cursor-not-allowed
+            className={`flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-5 md:py-2 rounded-lg md:rounded-xl font-bold text-xs md:text-sm transition-all shadow-md disabled:opacity-70 disabled:cursor-not-allowed
                 ${saveStatus === 'success' ? 'bg-emerald-500 text-white' :
                   saveStatus === 'error'   ? 'bg-red-500 text-white' :
                   'bg-white text-indigo-700 hover:bg-indigo-50'}`}
@@ -126,7 +126,7 @@ const Profile = () => {
     ];
 
     return (
-        <div className="max-w-5xl mx-auto space-y-6 pb-12 animate-in fade-in duration-500">
+        <div className="max-w-5xl mx-auto space-y-4 pb-6 md:space-y-6 md:pb-12 animate-in fade-in duration-500">
             <PageHeader
                 title="Edit Profile"
                 subtitle="Update your academic profile and study preferences"
@@ -137,12 +137,12 @@ const Profile = () => {
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col md:flex-row">
 
                 {/* ── Sidebar Tabs ── */}
-                <div className="w-full md:w-56 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-100 flex flex-row md:flex-col gap-1 p-4 overflow-x-auto shrink-0">
+                <div className="w-full md:w-56 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-100 flex flex-row md:flex-col gap-0.5 md:gap-1 p-2.5 md:p-4 overflow-x-auto shrink-0">
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm font-bold transition-all whitespace-nowrap
+                            className={`flex items-center gap-2 md:gap-3 px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl text-left text-xs md:text-sm font-bold transition-all whitespace-nowrap
                                 ${activeTab === tab.id
                                     ? 'bg-indigo-600 text-white shadow-sm'
                                     : 'text-slate-500 hover:bg-white hover:text-indigo-600'}`}
@@ -154,7 +154,7 @@ const Profile = () => {
                 </div>
 
                 {/* ── Content Area ── */}
-                <div className="flex-1 p-8 bg-white">
+                <div className="flex-1 p-4 md:p-8 bg-white">
 
                     {/* LOADING SKELETON */}
                     {isLoading && (
@@ -172,15 +172,15 @@ const Profile = () => {
 
                     {/* PERSONAL INFO */}
                     {!isLoading && activeTab === 'personal' && (
-                        <div className="space-y-5 max-w-xl animate-in fade-in duration-200">
-                            <h2 className="text-lg font-black text-slate-800 border-b border-slate-100 pb-3 mb-4">Personal Information</h2>
+                        <div className="space-y-4 md:space-y-5 max-w-xl animate-in fade-in duration-200">
+                            <h2 className="text-base md:text-lg font-black text-slate-800 border-b border-slate-100 pb-2 md:pb-3 mb-3 md:mb-4">Personal Information</h2>
                             <div>
                                 <label className={labelCls}>Full Name</label>
                                 <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} className={inputCls} placeholder="Your full name" />
                             </div>
                             <div>
                                 <label className={labelCls}>Email</label>
-                                <input type="email" value={formData.email} disabled className="block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-400 cursor-not-allowed text-sm font-semibold" />
+                                <input type="email" value={formData.email} disabled className="block w-full px-3 md:px-4 py-2 md:py-2.5 bg-slate-50 border border-slate-200 rounded-lg md:rounded-xl text-slate-400 cursor-not-allowed text-sm font-semibold" />
                             </div>
                             <div>
                                 <label className={labelCls}>Mobile Number</label>
@@ -191,8 +191,8 @@ const Profile = () => {
 
                     {/* ACADEMIC */}
                     {!isLoading && activeTab === 'academic' && (
-                        <div className="space-y-5 max-w-xl animate-in fade-in duration-200">
-                            <h2 className="text-lg font-black text-slate-800 border-b border-slate-100 pb-3 mb-4">Academic Background</h2>
+                        <div className="space-y-4 md:space-y-5 max-w-xl animate-in fade-in duration-200">
+                            <h2 className="text-base md:text-lg font-black text-slate-800 border-b border-slate-100 pb-2 md:pb-3 mb-3 md:mb-4">Academic Background</h2>
                             <div>
                                 <label className={labelCls}>Current / Latest Degree</label>
                                 <select name="degree" value={formData.degree} onChange={handleChange} className={selectCls}>
@@ -210,7 +210,7 @@ const Profile = () => {
                                 <label className={labelCls}>GPA / Percentage</label>
                                 <input type="text" name="gpa" value={formData.gpa} onChange={handleChange} className={inputCls} placeholder="e.g. 3.8/4.0 or 85%" />
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3 md:gap-4">
                                 <div>
                                     <label className={labelCls}>English Test</label>
                                     <select name="englishTest" value={formData.englishTest} onChange={handleChange} className={selectCls}>
@@ -231,17 +231,17 @@ const Profile = () => {
 
                     {/* PREFERENCES */}
                     {!isLoading && activeTab === 'preferences' && (
-                        <div className="space-y-5 max-w-xl animate-in fade-in duration-200">
-                            <h2 className="text-lg font-black text-slate-800 border-b border-slate-100 pb-3 mb-4">Study Preferences</h2>
+                        <div className="space-y-4 md:space-y-5 max-w-xl animate-in fade-in duration-200">
+                            <h2 className="text-base md:text-lg font-black text-slate-800 border-b border-slate-100 pb-2 md:pb-3 mb-3 md:mb-4">Study Preferences</h2>
                             <div>
                                 <label className={labelCls}>Target Countries</label>
-                                <div className="grid grid-cols-3 gap-2 mt-1">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 md:gap-2 mt-1">
                                     {availableCountries.map(country => (
                                         <button
                                             key={country}
                                             type="button"
                                             onClick={() => handleCountryToggle(country)}
-                                            className={`py-2.5 px-3 border rounded-xl text-sm font-bold flex items-center justify-between transition-all
+                                            className={`py-2 md:py-2.5 px-2 md:px-3 border rounded-lg md:rounded-xl text-xs md:text-sm font-bold flex items-center justify-between transition-all
                                                 ${formData.targetCountries.includes(country)
                                                     ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm'
                                                     : 'border-slate-200 bg-white text-slate-500 hover:border-indigo-200 hover:text-indigo-600'}`}
@@ -266,8 +266,8 @@ const Profile = () => {
 
                     {/* GOALS & BUDGET */}
                     {!isLoading && activeTab === 'goals' && (
-                        <div className="space-y-5 max-w-xl animate-in fade-in duration-200">
-                            <h2 className="text-lg font-black text-slate-800 border-b border-slate-100 pb-3 mb-4">Goals & Budget</h2>
+                        <div className="space-y-4 md:space-y-5 max-w-xl animate-in fade-in duration-200">
+                            <h2 className="text-base md:text-lg font-black text-slate-800 border-b border-slate-100 pb-2 md:pb-3 mb-3 md:mb-4">Goals & Budget</h2>
                             <div>
                                 <label className={labelCls}>Estimated Annual Budget</label>
                                 <select name="budget" value={formData.budget} onChange={handleChange} className={selectCls}>

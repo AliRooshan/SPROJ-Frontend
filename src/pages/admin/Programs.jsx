@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, Plus, Filter, MoreHorizontal, MapPin, X, Edit2, Trash2, Eye, Clock } from 'lucide-react';
 import api from '../../services/api';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import AdminModalShell from '../../components/admin/AdminModalShell';
 
 const toEligibilityText = (eligibility) =>
     (Array.isArray(eligibility) ? eligibility : [])
@@ -226,22 +227,22 @@ const ManagePrograms = () => {
     const selectedUni = universities.find(u => Number(u.id) === Number(activeProgram?.university_id));
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
+        <div className="space-y-4 md:space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-white tracking-tight">Programs</h1>
-                    <p className="text-zinc-400 font-medium">Manage normalized program records from database.</p>
+                    <h1 className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight">Programs</h1>
+                    <p className="text-zinc-600 font-medium">Manage normalized program records from database.</p>
                 </div>
                 <button
                     onClick={openAddModal}
-                    className="flex items-center gap-2 px-5 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/20 transition-all hover:-translate-y-0.5"
+                    className="flex items-center gap-2 px-5 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/12 transition-all hover:-translate-y-0.5"
                 >
                     <Plus size={18} />
                     <span>Add Program</span>
                 </button>
             </div>
 
-            <div className="bg-[#18181b] p-4 rounded-2xl border border-zinc-800 flex flex-col lg:flex-row gap-4">
+            <div className="bg-zinc-100 p-4 rounded-2xl border border-zinc-200 flex flex-col lg:flex-row gap-4">
                 <div className="flex-1 relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={20} />
                     <input
@@ -249,37 +250,37 @@ const ManagePrograms = () => {
                         placeholder="Search by name, university, field..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-zinc-900/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+                        className="w-full pl-12 pr-4 py-3 bg-zinc-50/80 border border-zinc-300 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
                     />
                 </div>
                 <div className="flex gap-2 relative">
                     <button
                         onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                        className="px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-zinc-300 font-bold hover:bg-zinc-800 flex items-center gap-2"
+                        className="px-4 py-3 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-700 font-bold hover:bg-zinc-200 flex items-center gap-2"
                     >
                         <Filter size={18} />
                     </button>
                     {showFilterDropdown && (
-                        <div className="absolute right-0 top-14 w-72 bg-[#18181b] border border-zinc-800 rounded-xl shadow-2xl z-50 p-3 space-y-3">
-                            <select value={filterCountry} onChange={(e) => setFilterCountry(e.target.value)} className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-200">
+                        <div className="absolute right-0 top-14 w-72 bg-zinc-100 border border-zinc-200 rounded-xl shadow-2xl z-50 p-3 space-y-3">
+                            <select value={filterCountry} onChange={(e) => setFilterCountry(e.target.value)} className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800">
                                 <option value="All">All Countries</option>
                                 {filters.countries.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
-                            <select value={filterDegree} onChange={(e) => setFilterDegree(e.target.value)} className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-200">
+                            <select value={filterDegree} onChange={(e) => setFilterDegree(e.target.value)} className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800">
                                 <option value="All">All Degrees</option>
                                 {filters.degrees.map(d => <option key={d} value={d}>{d}</option>)}
                             </select>
-                            <select value={filterDuration} onChange={(e) => setFilterDuration(e.target.value)} className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-200">
+                            <select value={filterDuration} onChange={(e) => setFilterDuration(e.target.value)} className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800">
                                 <option value="All">All Durations</option>
                                 {filters.durations.map(d => <option key={d} value={d}>{d}</option>)}
                             </select>
-                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-200">
+                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800">
                                 <option value="id">Default Sort</option>
                                 <option value="price_high">Tuition: High to Low</option>
                                 <option value="price_low">Tuition: Low to High</option>
                             </select>
                             <div>
-                                <label className="text-xs text-zinc-400 font-bold">
+                                <label className="text-xs text-zinc-600 font-bold">
                                     Max Standard Tuition: {(tuitionMax == null ? maxTuition : tuitionMax).toLocaleString()}
                                 </label>
                                 <input
@@ -294,7 +295,7 @@ const ManagePrograms = () => {
                             </div>
                             <button
                                 onClick={() => { setFilterCountry('All'); setFilterDegree('All'); setFilterDuration('All'); setSortBy('id'); setTuitionMax(null); setShowFilterDropdown(false); }}
-                                className="w-full px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-500/10 rounded-lg"
+                                className="w-full px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg"
                             >
                                 Reset Filters
                             </button>
@@ -305,10 +306,10 @@ const ManagePrograms = () => {
 
             <div className="grid grid-cols-1 gap-4">
                 {!loading && filteredPrograms.map((p) => (
-                    <div key={p.id} className="group bg-[#18181b] p-5 rounded-2xl border border-zinc-800 hover:border-amber-500/30 transition-all flex items-center justify-between gap-4">
+                    <div key={p.id} className="group bg-zinc-100 p-5 rounded-2xl border border-zinc-200 hover:border-amber-500/30 transition-all flex items-center justify-between gap-4">
                         <div className="min-w-0">
-                            <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-1">{p.program}</h3>
-                            <div className="text-sm text-zinc-400 flex flex-wrap items-center gap-3 mt-1">
+                            <h3 className="text-lg font-bold text-zinc-900 group-hover:text-amber-600 transition-colors line-clamp-1">{p.program}</h3>
+                            <div className="text-sm text-zinc-600 flex flex-wrap items-center gap-3 mt-1">
                                 <span>{p.university}</span>
                                 <span className="flex items-center gap-1"><MapPin size={14} />{p.city}, {p.country}</span>
                                 <span className="flex items-center gap-1"><Clock size={14} />{p.duration}</span>
@@ -316,22 +317,22 @@ const ManagePrograms = () => {
                         </div>
                         <div className="flex items-center gap-4">
                             <div className="text-right">
-                                <div className="text-white font-bold">{p.currency} {Number(p.tuition_amount ?? 0).toLocaleString()}</div>
+                                <div className="text-zinc-900 font-bold">{p.currency} {Number(p.tuition_amount ?? 0).toLocaleString()}</div>
                                 <div className="text-[11px] text-zinc-500">USD: {Number(p.standard_tuition ?? 0).toLocaleString()}</div>
                             </div>
                             <div className="relative">
-                                <button onClick={() => setOpenMenuId(openMenuId === p.id ? null : p.id)} className="p-2 hover:bg-zinc-700 rounded-lg text-zinc-400">
+                                <button onClick={() => setOpenMenuId(openMenuId === p.id ? null : p.id)} className="p-2 hover:bg-zinc-300 rounded-lg text-zinc-600">
                                     <MoreHorizontal size={20} />
                                 </button>
                                 {openMenuId === p.id && (
-                                    <div className="absolute right-0 top-10 w-48 bg-[#18181b] border border-zinc-800 rounded-xl shadow-2xl z-50 p-2">
-                                        <button onClick={() => openDetailsModal(p)} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg">
+                                    <div className="absolute right-0 top-10 w-48 bg-zinc-100 border border-zinc-200 rounded-xl shadow-2xl z-50 p-2">
+                                        <button onClick={() => openDetailsModal(p)} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-200 rounded-lg">
                                             <Eye size={16} /> See Details
                                         </button>
-                                        <button onClick={() => openEditModal(p)} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg">
+                                        <button onClick={() => openEditModal(p)} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-200 rounded-lg">
                                             <Edit2 size={16} /> Edit Program
                                         </button>
-                                        <button onClick={() => { setDeleteConfirmId(p.id); setOpenMenuId(null); }} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg">
+                                        <button onClick={() => { setDeleteConfirmId(p.id); setOpenMenuId(null); }} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg">
                                             <Trash2 size={16} /> Delete Program
                                         </button>
                                     </div>
@@ -346,22 +347,22 @@ const ManagePrograms = () => {
             </div>
 
             {(isModalOpen || isEditModalOpen) && activeProgram && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#18181b] w-full max-w-2xl rounded-2xl border border-zinc-800 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-                        <div className="p-6 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
-                            <h2 className="text-xl font-black text-white">{isModalOpen ? 'Add Program' : 'Edit Program'}</h2>
-                            <button onClick={() => { setIsModalOpen(false); setIsEditModalOpen(false); }} className="text-zinc-500 hover:text-white"><X size={24} /></button>
+                <AdminModalShell>
+                    <div className="bg-zinc-100 w-full max-w-xl rounded-xl border border-zinc-200 shadow-2xl overflow-hidden max-h-[min(85dvh,40rem)] flex flex-col">
+                        <div className="px-4 py-2.5 border-b border-zinc-200 flex justify-between items-center bg-zinc-50/80 shrink-0">
+                            <h2 className="text-lg font-black text-zinc-900">{isModalOpen ? 'Add Program' : 'Edit Program'}</h2>
+                            <button type="button" onClick={() => { setIsModalOpen(false); setIsEditModalOpen(false); }} className="text-zinc-500 hover:text-zinc-900 p-0.5"><X size={20} /></button>
                         </div>
-                        <div className="p-6 space-y-4 overflow-y-auto">
-                            {errorMsg && <div className="text-red-400 text-sm font-semibold">{errorMsg}</div>}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="px-4 py-3 space-y-3 overflow-y-auto">
+                            {errorMsg && <div className="text-red-600 text-sm font-semibold">{errorMsg}</div>}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-sm font-bold text-zinc-400 mb-1.5">University</label>
+                                    <label className="block text-xs font-bold text-zinc-600 mb-1">University</label>
                                     <select
                                         value={activeProgram.university_id}
                                         disabled={isEditModalOpen}
                                         onChange={(e) => updateField('university_id', e.target.value)}
-                                        className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white disabled:bg-zinc-800/60 disabled:text-zinc-400 disabled:border-zinc-600 disabled:border-dashed disabled:cursor-not-allowed"
+                                        className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900 disabled:bg-zinc-100 disabled:text-zinc-600 disabled:border-zinc-300 disabled:border-dashed disabled:cursor-not-allowed"
                                     >
                                         {universities.map(u => (
                                             <option key={u.id} value={u.id}>{u.name}</option>
@@ -371,64 +372,64 @@ const ManagePrograms = () => {
                                 {isEditModalOpen && (
                                     <>
                                         <div>
-                                            <label className="block text-sm font-bold text-zinc-400 mb-1.5">City</label>
-                                            <input readOnly value={activeProgram.city || selectedUni?.city || ''} className="w-full px-4 py-3 rounded-xl bg-zinc-800/60 border border-dashed border-zinc-600 text-zinc-300 cursor-not-allowed" />
+                                            <label className="block text-xs font-bold text-zinc-600 mb-1">City</label>
+                                            <input readOnly value={activeProgram.city || selectedUni?.city || ''} className="w-full px-3 py-2 rounded-lg bg-zinc-100 border border-dashed border-zinc-300 text-sm text-zinc-700 cursor-not-allowed" />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold text-zinc-400 mb-1.5">Country</label>
-                                            <input readOnly value={activeProgram.country || selectedUni?.country || ''} className="w-full px-4 py-3 rounded-xl bg-zinc-800/60 border border-dashed border-zinc-600 text-zinc-300 cursor-not-allowed" />
+                                            <label className="block text-xs font-bold text-zinc-600 mb-1">Country</label>
+                                            <input readOnly value={activeProgram.country || selectedUni?.country || ''} className="w-full px-3 py-2 rounded-lg bg-zinc-100 border border-dashed border-zinc-300 text-sm text-zinc-700 cursor-not-allowed" />
                                         </div>
                                     </>
                                 )}
                                 <div>
-                                    <label className="block text-sm font-bold text-zinc-400 mb-1.5">Name</label>
-                                    <input value={activeProgram.name || ''} onChange={(e) => updateField('name', e.target.value)} className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white" />
+                                    <label className="block text-xs font-bold text-zinc-600 mb-1">Name</label>
+                                    <input value={activeProgram.name || ''} onChange={(e) => updateField('name', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-zinc-400 mb-1.5">Degree Level</label>
-                                    <select value={activeProgram.degree_level || ''} onChange={(e) => updateField('degree_level', e.target.value)} className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
+                                    <label className="block text-xs font-bold text-zinc-600 mb-1">Degree Level</label>
+                                    <select value={activeProgram.degree_level || ''} onChange={(e) => updateField('degree_level', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900">
                                         <option value="">Select degree level</option>
                                         <option value="Masters">Masters</option>
                                         <option value="PHD">PHD</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-zinc-400 mb-1.5">Field of Study</label>
-                                    <input value={activeProgram.field_of_study || ''} onChange={(e) => updateField('field_of_study', e.target.value)} className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white" />
+                                    <label className="block text-xs font-bold text-zinc-600 mb-1">Field of Study</label>
+                                    <input value={activeProgram.field_of_study || ''} onChange={(e) => updateField('field_of_study', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-zinc-400 mb-1.5">Deadline</label>
-                                    <input type="date" value={activeProgram.deadline ? String(activeProgram.deadline).slice(0, 10) : ''} onChange={(e) => updateField('deadline', e.target.value)} className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white" />
+                                    <label className="block text-xs font-bold text-zinc-600 mb-1">Deadline</label>
+                                    <input type="date" value={activeProgram.deadline ? String(activeProgram.deadline).slice(0, 10) : ''} onChange={(e) => updateField('deadline', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-zinc-400 mb-1.5">Tuition Amount</label>
-                                    <input type="number" min="0.01" step="0.01" value={activeProgram.tuition_amount ?? ''} onChange={(e) => updateField('tuition_amount', e.target.value)} className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white" />
+                                    <label className="block text-xs font-bold text-zinc-600 mb-1">Tuition Amount</label>
+                                    <input type="number" min="0.01" step="0.01" value={activeProgram.tuition_amount ?? ''} onChange={(e) => updateField('tuition_amount', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-zinc-400 mb-1.5">Currency</label>
-                                    <select value={activeProgram.currency || 'USD'} onChange={(e) => updateField('currency', e.target.value)} className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white">
+                                    <label className="block text-xs font-bold text-zinc-600 mb-1">Currency</label>
+                                    <select value={activeProgram.currency || 'USD'} onChange={(e) => updateField('currency', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900">
                                         {currencies.map(c => (
                                             <option key={c} value={c}>{c}</option>
                                         ))}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-zinc-400 mb-1.5">Duration (Years)</label>
-                                    <input value={activeProgram.duration || ''} onChange={(e) => updateField('duration', e.target.value)} className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white" />
+                                    <label className="block text-xs font-bold text-zinc-600 mb-1">Duration (Years)</label>
+                                    <input value={activeProgram.duration || ''} onChange={(e) => updateField('duration', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-zinc-400 mb-1.5">Website</label>
-                                    <input type="url" value={activeProgram.website || ''} onChange={(e) => updateField('website', e.target.value)} className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white" />
+                                    <label className="block text-xs font-bold text-zinc-600 mb-1">Website</label>
+                                    <input type="url" value={activeProgram.website || ''} onChange={(e) => updateField('website', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-zinc-400 mb-1.5">Description</label>
-                                <textarea rows={3} value={activeProgram.description || ''} onChange={(e) => updateField('description', e.target.value)} className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white resize-none" />
+                                <label className="block text-xs font-bold text-zinc-600 mb-1">Description</label>
+                                <textarea rows={2} value={activeProgram.description || ''} onChange={(e) => updateField('description', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900 resize-none" />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-zinc-400 mb-1.5">Eligibility (one rule per line)</label>
+                                <label className="block text-xs font-bold text-zinc-600 mb-1">Eligibility (one rule per line)</label>
                                 <textarea
-                                    rows={4}
+                                    rows={3}
                                     value={activeProgram.eligibility || '- '}
                                     onChange={(e) => updateField('eligibility', normalizeEligibilityInput(e.target.value))}
                                     onKeyDown={(e) => {
@@ -440,69 +441,69 @@ const ManagePrograms = () => {
                                             }
                                         }
                                     }}
-                                    className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white resize-none"
+                                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900 resize-none"
                                 />
                             </div>
-                            <div className="pt-2 flex gap-3">
-                                <button onClick={() => { setIsModalOpen(false); setIsEditModalOpen(false); }} className="flex-1 py-3 rounded-xl bg-zinc-800 text-zinc-300 font-bold hover:bg-zinc-700">Cancel</button>
-                                <button onClick={() => upsertProgram(isModalOpen ? 'create' : 'update')} className="flex-1 py-3 rounded-xl bg-amber-500 text-black font-bold hover:bg-amber-400">
+                            <div className="pt-1 flex gap-2">
+                                <button type="button" onClick={() => { setIsModalOpen(false); setIsEditModalOpen(false); }} className="flex-1 py-2 rounded-lg bg-zinc-200 text-sm text-zinc-700 font-bold hover:bg-zinc-300">Cancel</button>
+                                <button type="button" onClick={() => upsertProgram(isModalOpen ? 'create' : 'update')} className="flex-1 py-2 rounded-lg bg-amber-500 text-sm text-black font-bold hover:bg-amber-400">
                                     {isModalOpen ? 'Create Program' : 'Update Program'}
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
+                </AdminModalShell>
             )}
 
             {isDetailsModalOpen && activeProgram && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#18181b] w-full max-w-2xl rounded-2xl border border-zinc-800 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-                        <div className="p-5 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
-                            <h2 className="text-lg font-black text-white">Program Details</h2>
-                            <button onClick={() => setIsDetailsModalOpen(false)} className="text-zinc-500 hover:text-white"><X size={22} /></button>
+                <AdminModalShell>
+                    <div className="bg-zinc-100 w-full max-w-lg rounded-xl border border-zinc-200 shadow-2xl overflow-hidden max-h-[min(85dvh,36rem)] flex flex-col">
+                        <div className="px-4 py-2.5 border-b border-zinc-200 flex justify-between items-center bg-zinc-50/80 shrink-0">
+                            <h2 className="text-base font-black text-zinc-900">Program Details</h2>
+                            <button type="button" onClick={() => setIsDetailsModalOpen(false)} className="text-zinc-500 hover:text-zinc-900 p-0.5"><X size={20} /></button>
                         </div>
-                        <div className="p-5 grid grid-cols-2 gap-3 text-sm overflow-y-auto">
-                            <div className="text-zinc-300"><span className="text-zinc-500">Name:</span> {activeProgram.program}</div>
-                            <div className="text-zinc-300"><span className="text-zinc-500">University:</span> {activeProgram.university}</div>
-                            <div className="text-zinc-300"><span className="text-zinc-500">City:</span> {activeProgram.city}</div>
-                            <div className="text-zinc-300"><span className="text-zinc-500">Country:</span> {activeProgram.country}</div>
-                            <div className="text-zinc-300"><span className="text-zinc-500">Degree:</span> {activeProgram.degree_level}</div>
-                            <div className="text-zinc-300"><span className="text-zinc-500">Field:</span> {activeProgram.field_of_study}</div>
-                            <div className="text-zinc-300"><span className="text-zinc-500">Deadline:</span> {formatDate(activeProgram.deadline)}</div>
-                            <div className="text-zinc-300"><span className="text-zinc-500">Tuition:</span> {activeProgram.currency} {Number(activeProgram.tuition_amount ?? 0).toLocaleString()}</div>
-                            <div className="text-zinc-300 col-span-2"><span className="text-zinc-500">Duration:</span> {activeProgram.duration}</div>
-                            <div className="text-zinc-300 col-span-2">
+                        <div className="px-4 py-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs overflow-y-auto">
+                            <div className="text-zinc-700"><span className="text-zinc-500">Name:</span> {activeProgram.program}</div>
+                            <div className="text-zinc-700"><span className="text-zinc-500">University:</span> {activeProgram.university}</div>
+                            <div className="text-zinc-700"><span className="text-zinc-500">City:</span> {activeProgram.city}</div>
+                            <div className="text-zinc-700"><span className="text-zinc-500">Country:</span> {activeProgram.country}</div>
+                            <div className="text-zinc-700"><span className="text-zinc-500">Degree:</span> {activeProgram.degree_level}</div>
+                            <div className="text-zinc-700"><span className="text-zinc-500">Field:</span> {activeProgram.field_of_study}</div>
+                            <div className="text-zinc-700"><span className="text-zinc-500">Deadline:</span> {formatDate(activeProgram.deadline)}</div>
+                            <div className="text-zinc-700"><span className="text-zinc-500">Tuition:</span> {activeProgram.currency} {Number(activeProgram.tuition_amount ?? 0).toLocaleString()}</div>
+                            <div className="text-zinc-700 col-span-2"><span className="text-zinc-500">Duration:</span> {activeProgram.duration}</div>
+                            <div className="text-zinc-700 col-span-2">
                                 <span className="text-zinc-500">Website:</span>{' '}
                                 {activeProgram.website ? (
                                     <a
                                         href={activeProgram.website}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="text-amber-400 hover:text-amber-300 underline break-all"
+                                        className="text-amber-700 hover:text-amber-600 underline break-all"
                                     >
                                         {activeProgram.website}
                                     </a>
                                 ) : '—'}
                             </div>
-                            <div className="text-zinc-300 col-span-2"><span className="text-zinc-500">Description:</span> {activeProgram.description || '—'}</div>
-                            <div className="text-zinc-300 col-span-2">
+                            <div className="text-zinc-700 col-span-2"><span className="text-zinc-500">Description:</span> {activeProgram.description || '—'}</div>
+                            <div className="text-zinc-700 col-span-2">
                                 <span className="text-zinc-500 block mb-2">Eligibility:</span>
-                                <div className="flex flex-wrap gap-2">
+                                <div className="flex flex-wrap gap-1.5">
                                     {normalizeEligibility(activeProgram.eligibility).length > 0 ? (
                                         normalizeEligibility(activeProgram.eligibility).map((item, idx) => (
-                                            <span key={`${item}-${idx}`} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs">
+                                            <span key={`${item}-${idx}`} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-200 border border-zinc-300 text-zinc-800 text-[11px]">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                                                 {item}
                                             </span>
                                         ))
                                     ) : (
-                                        <span className="text-zinc-400">—</span>
+                                        <span className="text-zinc-600">—</span>
                                     )}
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </AdminModalShell>
             )}
 
             <ConfirmDialog

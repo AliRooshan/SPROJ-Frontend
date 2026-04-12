@@ -30,7 +30,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             {/* Mobile Backdrop */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden animate-fade-in"
+                    className="fixed inset-0 bg-zinc-900/35 backdrop-blur-sm z-40 md:hidden animate-fade-in"
                     onClick={onClose}
                     aria-hidden="true"
                 />
@@ -38,8 +38,8 @@ const AdminSidebar = ({ isOpen, onClose }) => {
 
             <aside className={`
                 fixed inset-y-0 left-0 z-50 w-64 
-                bg-[#18181b]/95 md:bg-[#18181b]/80 backdrop-blur-xl 
-                border-r border-white/5 flex flex-col 
+                bg-zinc-100/95 md:bg-zinc-100/90 backdrop-blur-xl 
+                border-r border-zinc-200/90 flex flex-col 
                 transition-transform duration-300 ease-in-out
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
                 md:translate-x-0
@@ -51,7 +51,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                             <ShieldCheck className="text-white w-6 h-6" />
                         </div>
                         <div>
-                            <h1 className="text-lg font-black text-zinc-100 tracking-tight leading-none">Admin<span className="text-amber-500">.</span></h1>
+                            <h1 className="text-lg font-black text-zinc-900 tracking-tight leading-none">Admin<span className="text-amber-600">.</span></h1>
                             <p className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase mt-1">Control Panel</p>
                         </div>
                     </div>
@@ -67,18 +67,18 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                             className={({ isActive }) => `
                                 flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative
                                 ${isActive
-                                    ? 'bg-zinc-800 text-white shadow-md border border-zinc-700/50'
-                                    : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50'}
+                                    ? 'bg-white text-zinc-900 shadow-md border border-zinc-200/90'
+                                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'}
                             `}
                         >
                             {({ isActive }) => (
                                 <>
-                                    <item.icon size={20} className={`shrink-0 transition-colors ${isActive ? 'text-amber-500' : 'text-zinc-500 group-hover:text-zinc-300'}`} />
+                                    <item.icon size={20} className={`shrink-0 transition-colors ${isActive ? 'text-amber-600' : 'text-zinc-500 group-hover:text-zinc-700'}`} />
                                     <span className="font-bold text-sm tracking-wide">{item.label}</span>
 
                                     {/* Active Indicator */}
                                     {isActive && (
-                                        <div className="absolute right-2 w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                                        <div className="absolute right-2 w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.35)]" />
                                     )}
                                 </>
                             )}
@@ -87,10 +87,10 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 </nav>
 
                 {/* Logout Area */}
-                <div className="p-6 border-t border-white/5 bg-zinc-900/30">
+                <div className="p-6 border-t border-zinc-200/80 bg-zinc-200/40">
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-all group font-bold text-sm"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-600 hover:text-red-600 hover:bg-red-50 transition-all group font-bold text-sm"
                     >
                         <LogOut size={20} className="shrink-0" />
                         <span>Sign Out</span>

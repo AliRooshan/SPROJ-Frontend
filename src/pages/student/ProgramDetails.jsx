@@ -90,7 +90,7 @@ const ProgramDetails = () => {
     if (!program) return <div className="p-12 text-center text-slate-500 font-bold animate-pulse">Loading program details...</div>;
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="max-w-6xl mx-auto space-y-4 pb-6 md:space-y-6 md:pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
             <PageHeader
                 title={program.program}
@@ -158,9 +158,9 @@ const ProgramDetails = () => {
             </div>
 
             {/* Program Overview + Eligibility — two columns */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 items-start">
                 {/* Program Overview */}
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-7 space-y-6 h-full">
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-4 md:p-7 md:space-y-6 h-full">
                     <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
                         <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
                             <Globe size={22} />
@@ -193,7 +193,7 @@ const ProgramDetails = () => {
 
                 {/* Eligibility Criteria */}
                 {eligibilityList.length > 0 ? (
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-7 space-y-5 h-full">
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3 md:p-7 md:space-y-5 h-full">
                         <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
                             <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
                                 <CheckCircle size={22} />
@@ -209,7 +209,7 @@ const ProgramDetails = () => {
                         </ul>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-7 h-full flex items-center justify-center">
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 md:p-7 h-full flex items-center justify-center">
                         <p className="text-slate-400 text-sm font-medium italic">No eligibility criteria specified.</p>
                     </div>
                 )}

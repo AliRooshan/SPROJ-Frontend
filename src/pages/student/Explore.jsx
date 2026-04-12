@@ -99,15 +99,15 @@ const Explore = ({ isGuest = false }) => {
     const activeFilterCount = selectedCountries.length + selectedDegrees.length + (selectedDuration !== 'All' ? 1 : 0) + (budgetRange[0] !== 0 || budgetRange[1] !== maxBudget ? 1 : 0);
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6 pb-12 animate-in fade-in duration-500">
+        <div className="max-w-6xl mx-auto space-y-4 pb-6 md:space-y-6 md:pb-12 animate-in fade-in duration-500">
             <PageHeader
                 title="Explore Programs"
                 subtitle={`${filteredPrograms.length} programs across ${countries.length - 1} countries`}
                 icon={Compass}
                 actions={
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col w-full gap-2 md:flex-row md:items-center md:gap-3 md:w-auto">
                         {/* Compact Search Bar */}
-                        <div className="relative w-52 sm:w-64 group">
+                        <div className="relative w-full max-w-xs sm:max-w-none sm:w-64 group">
                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <Search className="text-indigo-500 group-focus-within:text-indigo-600 transition-colors" size={16} />
                             </div>
@@ -308,7 +308,7 @@ const Explore = ({ isGuest = false }) => {
             )}
 
             {/* Results */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                 {filteredPrograms.length > 0 ? (
                     filteredPrograms.map(program => (
                         <ProgramCard
@@ -320,17 +320,17 @@ const Explore = ({ isGuest = false }) => {
                         />
                     ))
                 ) : (
-                    <div className="col-span-full py-20 px-6 bg-white/60 glass-card rounded-[2rem] border-dashed border-indigo-300 flex flex-col items-center justify-center text-center backdrop-blur-sm">
+                    <div className="col-span-full py-10 px-4 md:py-20 md:px-6 bg-white/60 glass-card rounded-[2rem] border-dashed border-indigo-300 flex flex-col items-center justify-center text-center backdrop-blur-sm">
                         <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6 shadow-inner">
                             <Search className="text-indigo-400" size={32} />
                         </div>
                         <h3 className="text-2xl font-black text-slate-800 mb-2">No programs found</h3>
-                        <p className="text-slate-600 max-w-md mx-auto mb-8 font-medium">
+                        <p className="text-slate-600 max-w-md mx-auto mb-4 md:mb-8 text-sm md:text-base font-medium">
                             We couldn't find any programs matching your search criteria. Try adjusting your filters or search terms.
                         </p>
                         <button
                             onClick={() => { setSearchTerm(''); setSelectedCountries([]); setSelectedDegrees([]); }}
-                            className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-200 hover:-translate-y-1"
+                            className="px-5 py-2.5 md:px-8 md:py-3 text-sm md:text-base bg-indigo-600 text-white font-bold rounded-lg md:rounded-xl hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-200 hover:-translate-y-1"
                         >
                             Clear all filters
                         </button>

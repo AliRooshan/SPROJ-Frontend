@@ -37,7 +37,7 @@ const SavedScholarships = () => {
 
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 pb-12">
+        <div className="space-y-4 md:space-y-8 animate-in fade-in duration-500 pb-6 md:pb-12">
             <PageHeader
                 title="Saved Scholarships"
                 subtitle={`You have ${savedScholarships.length} scholarships saved to your collection.`}
@@ -55,7 +55,7 @@ const SavedScholarships = () => {
 
             {/* Scholarships Grid */}
             {savedScholarships.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                     {savedScholarships.map(scholarship => (
                         <div key={scholarship.id} className="bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 p-4 space-y-3 group flex flex-col">
                             {/* Header: Provider & Remove(Unsave) */}
@@ -106,15 +106,15 @@ const SavedScholarships = () => {
                     ))}
                 </div>
             ) : (
-                <div className="bg-white/60 backdrop-blur-xl border-2 border-dashed border-emerald-200 rounded-3xl p-16 flex flex-col items-center justify-center text-center">
+                <div className="bg-white/60 backdrop-blur-xl border-2 border-dashed border-emerald-200 rounded-2xl p-8 md:rounded-3xl md:p-16 flex flex-col items-center justify-center text-center">
                     <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mb-6">
                         <Search className="text-emerald-400" size={40} />
                     </div>
                     <h3 className="text-2xl font-black text-slate-700 mb-3">No saved scholarships yet</h3>
-                    <p className="text-slate-500 mb-8 max-w-md">Discover funding opportunities to support your studies abroad.</p>
+                    <p className="text-slate-500 mb-4 md:mb-8 text-sm md:text-base max-w-md">Discover funding opportunities to support your studies abroad.</p>
                     <button
                         onClick={() => navigate('/student/scholarships')}
-                        className="px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5 transition-all"
+                        className="px-5 py-2.5 md:px-8 md:py-3 text-sm md:text-base bg-emerald-600 text-white rounded-lg md:rounded-xl font-bold shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5 transition-all"
                     >
                         Explore Scholarships
                     </button>

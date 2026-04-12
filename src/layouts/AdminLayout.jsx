@@ -7,32 +7,29 @@ const AdminLayout = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     return (
-        <div className="min-h-screen relative flex selection:bg-amber-500 selection:text-white overflow-hidden bg-[#0f1012] font-sans text-slate-100">
-            {/* Global Background - Warmer & Lighter Dark Mode */}
+        <div className="min-h-screen relative flex selection:bg-amber-300 selection:text-zinc-900 overflow-hidden bg-zinc-200 font-sans text-zinc-800">
+            {/* Soft warm light shell (not pure white) */}
             <div className="fixed inset-0 z-0">
-                {/* Background Gradient - Zinc/Stone tones (Warmer) */}
-                <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-[#131416] to-[#0f1012]"></div>
-
-                {/* Ambient Warm Glows */}
-                <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-orange-500/5 blur-[120px] pointer-events-none"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-zinc-100 via-stone-100 to-zinc-200"></div>
+                <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-amber-200/25 blur-[120px] pointer-events-none"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-orange-200/20 blur-[120px] pointer-events-none"></div>
             </div>
 
             <AdminSidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
-            <div className="flex-1 ml-0 md:ml-64 flex flex-col min-w-0 relative z-10 h-screen overflow-hidden transition-all duration-300">
+            <div className="flex-1 ml-0 md:ml-64 flex flex-col min-w-0 relative min-h-0 h-screen overflow-hidden transition-all duration-300">
                 {/* Mobile Header */}
-                <div className="md:hidden flex items-center p-4 border-b border-white/5 bg-[#18181b]/80 backdrop-blur-xl sticky top-0 z-40">
+                <div className="md:hidden flex items-center p-4 border-b border-zinc-200/90 bg-zinc-100/90 backdrop-blur-xl sticky top-0 z-40">
                     <button
                         onClick={() => setIsMobileMenuOpen(true)}
-                        className="p-2 -ml-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+                        className="p-2 -ml-2 text-zinc-600 hover:text-zinc-900 rounded-lg hover:bg-zinc-200/80 transition-colors"
                     >
                         <Menu size={24} />
                     </button>
-                    <span className="ml-3 font-bold text-lg text-zinc-100">Admin Panel</span>
+                    <span className="ml-3 font-bold text-lg text-zinc-900">Admin Panel</span>
                 </div>
 
-                <main className="flex-1 overflow-y-auto p-4 md:p-10 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 hover:scrollbar-thumb-white/20 pb-20 md:pb-10">
+                <main className="flex-1 overflow-y-auto p-3 pb-16 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-300/70 hover:scrollbar-thumb-zinc-400/90 md:p-10 md:pb-10">
                     <Outlet />
                 </main>
             </div>

@@ -62,22 +62,22 @@ const AdminSettings = () => {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl mx-auto">
+        <div className="space-y-4 md:space-y-8 animate-in fade-in duration-500 max-w-4xl mx-auto">
             <div>
-                <h1 className="text-3xl font-black text-white tracking-tight">Settings</h1>
-                <p className="text-zinc-400 font-medium">Manage your admin profile and system preferences.</p>
+                <h1 className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight">Settings</h1>
+                <p className="text-zinc-600 font-medium">Manage your admin profile and system preferences.</p>
             </div>
 
-            <div className="bg-[#18181b] rounded-[2rem] border border-zinc-800 overflow-hidden">
+            <div className="bg-zinc-100 rounded-[2rem] border border-zinc-200 overflow-hidden">
                 {/* Tabs / Header */}
-                <div className="p-2 border-b border-zinc-800 bg-zinc-900/50 flex gap-1 overflow-x-auto">
+                <div className="p-2 border-b border-zinc-200 bg-zinc-50/80 flex gap-1 overflow-x-auto">
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${activeTab === tab.id
-                                ? 'bg-zinc-800 text-white shadow-sm'
-                                : 'hover:bg-zinc-800/50 text-zinc-400 hover:text-white'
+                                ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200'
+                                : 'hover:bg-zinc-200/70 text-zinc-600 hover:text-zinc-900'
                                 }`}
                         >
                             <tab.icon size={16} />
@@ -88,7 +88,7 @@ const AdminSettings = () => {
 
                 <div className="p-8 md:p-10 space-y-8">
                     {feedback && (
-                        <div className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-200">
+                        <div className="rounded-xl border border-zinc-300 bg-zinc-50 px-4 py-3 text-sm text-zinc-800">
                             {feedback}
                         </div>
                     )}
@@ -96,14 +96,14 @@ const AdminSettings = () => {
                     {activeTab === 'profile' && (
                         <>
                             {/* Avatar Section */}
-                            <div className="flex items-center gap-6 pb-8 border-b border-zinc-800">
+                            <div className="flex items-center gap-6 pb-8 border-b border-zinc-200">
                                 <div className="w-24 h-24 rounded-full bg-amber-500 border-2 border-amber-500/50 flex items-center justify-center">
                                     <span className="text-4xl font-black text-black">
                                         {adminUser.fullName ? adminUser.fullName.charAt(0).toUpperCase() : 'A'}
                                     </span>
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold text-white">{adminUser.fullName}</h3>
+                                    <h3 className="text-xl font-bold text-zinc-900">{adminUser.fullName}</h3>
                                     <p className="text-zinc-500 text-sm mb-3">Super Administrator</p>
                                 </div>
                             </div>
@@ -114,21 +114,21 @@ const AdminSettings = () => {
                                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Full Name</label>
                                     <div className="relative">
                                         <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-                                        <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full pl-11 pr-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-white font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
+                                        <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Email Address</label>
                                     <div className="relative">
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-                                        <input type="email" readOnly value={adminUser.email || ''} className="w-full pl-11 pr-4 py-3 bg-zinc-900/60 border border-dashed border-zinc-700 rounded-xl text-zinc-300 font-medium cursor-not-allowed" />
+                                        <input type="email" readOnly value={adminUser.email || ''} className="w-full pl-11 pr-4 py-3 bg-zinc-50/95 border border-dashed border-zinc-300 rounded-xl text-zinc-700 font-medium cursor-not-allowed" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Role</label>
                                     <div className="relative">
                                         <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-                                        <input type="text" value="Administrator" readOnly className="w-full pl-11 pr-4 py-3 bg-zinc-900/60 border border-dashed border-zinc-700 rounded-xl text-zinc-300 font-medium cursor-not-allowed" />
+                                        <input type="text" value="Administrator" readOnly className="w-full pl-11 pr-4 py-3 bg-zinc-50/95 border border-dashed border-zinc-300 rounded-xl text-zinc-700 font-medium cursor-not-allowed" />
                                     </div>
                                 </div>
                             </div>
@@ -137,7 +137,7 @@ const AdminSettings = () => {
                             <div className="pt-6 flex justify-end">
                                 <button
                                     onClick={handleSaveProfile}
-                                    className="flex items-center gap-2 px-8 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/20 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                                    className="flex items-center gap-2 px-8 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/12 transition-all hover:-translate-y-0.5 active:translate-y-0"
                                 >
                                     <Save size={18} />
                                     Save Changes
@@ -151,7 +151,7 @@ const AdminSettings = () => {
                         <>
                             <div className="space-y-6">
                                 <div>
-                                    <h3 className="text-lg font-bold text-white mb-1">Change Password</h3>
+                                    <h3 className="text-lg font-bold text-zinc-900 mb-1">Change Password</h3>
                                     <p className="text-sm text-zinc-500">Update your password to keep your account secure.</p>
                                 </div>
 
@@ -160,21 +160,21 @@ const AdminSettings = () => {
                                         <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Current Password</label>
                                         <div className="relative">
                                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-                                            <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="Enter current password" className="w-full pl-11 pr-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-white font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
+                                            <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="Enter current password" className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">New Password</label>
                                         <div className="relative">
                                             <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-                                            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Enter new password" className="w-full pl-11 pr-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-white font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
+                                            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Enter new password" className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Confirm New Password</label>
                                         <div className="relative">
                                             <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-                                            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm new password" className="w-full pl-11 pr-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-white font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
+                                            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm new password" className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-medium focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" />
                                         </div>
                                     </div>
                                 </div>
@@ -182,7 +182,7 @@ const AdminSettings = () => {
                                 <div className="pt-4 flex justify-end">
                                     <button
                                         onClick={handleUpdatePassword}
-                                        className="flex items-center gap-2 px-8 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/20 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                                        className="flex items-center gap-2 px-8 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/12 transition-all hover:-translate-y-0.5 active:translate-y-0"
                                     >
                                         <Save size={18} />
                                         Update Password

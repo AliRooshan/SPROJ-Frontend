@@ -14,7 +14,7 @@ const StudentLayout = () => {
 
             <div className="relative z-10">
                 <Navbar />
-                <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+                <div className="pt-20 pb-6 px-3 sm:px-4 md:pt-24 md:pb-12 md:px-6 lg:px-8 max-w-7xl mx-auto">
                     <Outlet />
                 </div>
             </div>

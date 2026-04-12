@@ -18,7 +18,7 @@ const ProgramCard = ({ program, isGuest = false, isSaved = false, onToggleSave }
     };
 
     return (
-        <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 p-4 space-y-2 group">
+        <div className="bg-white/80 backdrop-blur-xl rounded-xl md:rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 p-3 md:p-4 space-y-1.5 md:space-y-2 group">
             {/* Header: Uni & Actions */}
             <div className="flex justify-between items-start gap-4">
                 <div className="flex items-center gap-2 text-slate-500 font-bold text-sm">
@@ -40,7 +40,7 @@ const ProgramCard = ({ program, isGuest = false, isSaved = false, onToggleSave }
             <div className="-mt-1">
                 <h3
                     onClick={handleNavigate}
-                    className="text-lg font-black text-slate-900 leading-tight cursor-pointer hover:text-indigo-600 transition-colors"
+                    className="text-base md:text-lg font-black text-slate-900 leading-tight cursor-pointer hover:text-indigo-600 transition-colors"
                 >
                     {programName}
                 </h3>

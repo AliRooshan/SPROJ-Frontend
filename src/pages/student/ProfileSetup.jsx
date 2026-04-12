@@ -110,8 +110,8 @@ const ProfileSetup = () => {
         switch (currentStep) {
             case 1:
                 return (
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-3 md:space-y-4">
+                        <div className="grid grid-cols-2 gap-3 md:gap-4">
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Full Name</label>
                                 <input
@@ -151,7 +151,7 @@ const ProfileSetup = () => {
                 );
             case 2:
                 return (
-                    <div className="space-y-4">
+                    <div className="space-y-3 md:space-y-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Latest Degree</label>
                             <select
@@ -165,7 +165,7 @@ const ProfileSetup = () => {
                                 <option>PhD</option>
                             </select>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-3 md:gap-4">
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Field of Study</label>
                                 <input
@@ -189,7 +189,7 @@ const ProfileSetup = () => {
                                 />
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-3 md:gap-4">
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">English Proficiency</label>
                                 <select
@@ -225,7 +225,7 @@ const ProfileSetup = () => {
                 );
             case 3:
                 return (
-                    <div className="space-y-6">
+                    <div className="space-y-4 md:space-y-6">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Target Country</label>
                             <select
@@ -240,7 +240,7 @@ const ProfileSetup = () => {
                                 ))}
                             </select>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-3 md:gap-4">
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Preferred Season</label>
                                 <select
@@ -285,7 +285,7 @@ const ProfileSetup = () => {
                 );
             case 4:
                 return (
-                    <div className="space-y-6">
+                    <div className="space-y-4 md:space-y-6">
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Estimated Annual Budget</label>
                             <select
@@ -320,7 +320,7 @@ const ProfileSetup = () => {
     };
 
     return (
-        <div className="relative w-full flex justify-center pt-0 pb-10">
+        <div className="relative w-full flex justify-center pt-0 pb-6 md:pb-10">
             {/* Full Screen Background Image & Overlay */}
             <div className="fixed inset-0 z-0">
                 <img
@@ -331,15 +331,15 @@ const ProfileSetup = () => {
                 <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"></div>
             </div>
 
-            <div className="max-w-xl w-full mx-auto relative z-10 animate-in fade-in zoom-in duration-500 p-4">
-                <div className="bg-white/95 backdrop-blur-2xl rounded-3xl overflow-hidden shadow-2xl border border-white/20 relative ring-1 ring-black/5">
+            <div className="max-w-xl w-full mx-auto relative z-10 animate-in fade-in zoom-in duration-500 p-3 md:p-4">
+                <div className="bg-white/95 backdrop-blur-2xl rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl border border-white/20 relative ring-1 ring-black/5">
 
                     {/* Progress Bar */}
-                    <div className="bg-indigo-50/50 border-b border-indigo-100/50 px-6 py-4 backdrop-blur-sm">
-                        <div className="flex justify-between items-center mb-4">
-                            <div>
-                                <h2 className="text-xl font-black text-slate-900 tracking-tight">Profile Setup</h2>
-                                <p className="text-slate-500 mt-0.5 text-xs font-medium">Complete these steps to personalize your experience.</p>
+                    <div className="bg-indigo-50/50 border-b border-indigo-100/50 px-4 py-3 md:px-6 md:py-4 backdrop-blur-sm">
+                        <div className="flex justify-between items-center mb-3 md:mb-4 gap-2">
+                            <div className="min-w-0">
+                                <h2 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">Profile Setup</h2>
+                                <p className="text-slate-500 mt-0.5 text-[10px] md:text-xs font-medium leading-snug">Complete these steps to personalize your experience.</p>
                             </div>
                             <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">Stage {currentStep}/4</span>
                         </div>
@@ -352,7 +352,7 @@ const ProfileSetup = () => {
                                     const isCompleted = step.number < currentStep;
                                     return (
                                         <div key={step.number} className="flex flex-col items-center group cursor-default">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 border-2 ${isActive ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100 scale-105' :
+                                            <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-all duration-500 border-2 ${isActive ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100 scale-105' :
                                                 isCompleted ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-slate-400 border-indigo-50'
                                                 }`}>
                                                 {isCompleted ? <Check size={14} /> : <Icon size={14} />}
@@ -365,7 +365,7 @@ const ProfileSetup = () => {
                     </div>
 
                     {/* Content */}
-                    <div className="px-6 py-4 min-h-[200px]">
+                    <div className="px-4 py-3 md:px-6 md:py-4 min-h-[180px] md:min-h-[200px]">
                         <div
                             key={currentStep}
                             className="animate-in fade-in slide-in-from-right-4 duration-300"
@@ -375,29 +375,29 @@ const ProfileSetup = () => {
                     </div>
 
                     {/* Footer */}
-                    <div className="bg-white/50 px-6 py-3 border-t border-indigo-50 flex justify-between items-center backdrop-blur-md">
+                    <div className="bg-white/50 px-4 py-2.5 md:px-6 md:py-3 border-t border-indigo-50 flex justify-between items-center gap-2 backdrop-blur-md">
                         {currentStep > 1 ? (
                             <button
                                 onClick={handleSkip}
-                                className="text-slate-500 hover:text-indigo-600 font-bold px-4 transition-colors text-sm"
+                                className="text-slate-500 hover:text-indigo-600 font-bold px-2 md:px-4 transition-colors text-xs md:text-sm shrink-0"
                             >
                                 Skip
                             </button>
                         ) : (
                             <div></div>
                         )}
-                        <div className="flex gap-3">
+                        <div className="flex gap-2 md:gap-3 shrink-0">
                             {currentStep > 1 && (
                                 <button
                                     onClick={handleBack}
-                                    className="px-5 py-2 border border-indigo-100 rounded-xl text-slate-500 font-bold hover:bg-white hover:text-indigo-600 transition-colors bg-white/50 text-sm"
+                                    className="px-3 py-1.5 md:px-5 md:py-2 border border-indigo-100 rounded-lg md:rounded-xl text-slate-500 font-bold hover:bg-white hover:text-indigo-600 transition-colors bg-white/50 text-xs md:text-sm"
                                 >
                                     Back
                                 </button>
                             )}
                             <button
                                 onClick={handleNext}
-                                className="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition flex items-center gap-2 shadow-lg shadow-indigo-200 hover:shadow-xl group text-sm"
+                                className="px-4 py-1.5 md:px-6 md:py-2 bg-indigo-600 text-white rounded-lg md:rounded-xl font-bold hover:bg-indigo-700 transition flex items-center gap-1.5 md:gap-2 shadow-lg shadow-indigo-200 hover:shadow-xl group text-xs md:text-sm"
                             >
                                 {currentStep === 4 ? 'Finish Setup' : 'Continue'}
                                 {currentStep === 4 ? <Save size={16} /> : <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />}

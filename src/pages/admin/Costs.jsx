@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import { Save, MapPin, Plus, X, Filter, Trash2 } from 'lucide-react';
 import api from '../../services/api';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import AdminModalShell from '../../components/admin/AdminModalShell';
 
 const LIFESTYLE_OPTIONS = ['low', 'medium', 'high'];
 
@@ -186,31 +187,31 @@ const ManageCosts = () => {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
+        <div className="space-y-4 md:space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-white tracking-tight">Costs</h1>
-                    <p className="text-zinc-400 font-medium">Living costs by city and lifestyle.</p>
+                    <h1 className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight">Costs</h1>
+                    <p className="text-zinc-600 font-medium">Living costs by city and lifestyle.</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                     <div className="relative">
                         <button
                             type="button"
                             onClick={() => setShowFilterDropdown((open) => !open)}
-                            className="px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-zinc-300 font-bold hover:bg-zinc-800 flex items-center gap-2"
+                            className="px-4 py-3 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-700 font-bold hover:bg-zinc-200 flex items-center gap-2"
                             aria-expanded={showFilterDropdown}
                             aria-haspopup="true"
                         >
                             <Filter size={18} />
                         </button>
                         {showFilterDropdown && (
-                            <div className="absolute right-0 top-14 w-64 bg-[#18181b] border border-zinc-800 rounded-xl shadow-2xl z-50 p-3 space-y-3">
+                            <div className="absolute right-0 top-14 w-64 bg-zinc-100 border border-zinc-200 rounded-xl shadow-2xl z-50 p-3 space-y-3">
                                 <div>
                                     <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Lifestyle</label>
                                     <select
                                         value={selectedLifestyle}
                                         onChange={(e) => setSelectedLifestyle(e.target.value)}
-                                        className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-200 text-sm"
+                                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800 text-sm"
                                     >
                                         {LIFESTYLE_OPTIONS.map((life) => (
                                             <option key={life} value={life}>
@@ -224,7 +225,7 @@ const ManageCosts = () => {
                                     <select
                                         value={selectedCountry}
                                         onChange={(e) => setSelectedCountry(e.target.value)}
-                                        className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-200 text-sm"
+                                        className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800 text-sm"
                                     >
                                         {availableCountries.map((country) => (
                                             <option key={country} value={country}>
@@ -240,7 +241,7 @@ const ManageCosts = () => {
                                         setSelectedCountry('All');
                                         setShowFilterDropdown(false);
                                     }}
-                                    className="w-full px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-500/10 rounded-lg"
+                                    className="w-full px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg"
                                 >
                                     Reset filters
                                 </button>
@@ -250,7 +251,7 @@ const ManageCosts = () => {
                     <button
                         type="button"
                         onClick={openAddModal}
-                        className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/20 transition-all"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/12 transition-all"
                     >
                         <Plus size={18} />
                         Add new
@@ -258,11 +259,11 @@ const ManageCosts = () => {
                 </div>
             </div>
 
-            <section className="relative bg-[#18181b] rounded-2xl border border-zinc-800 overflow-hidden flex flex-col min-h-0">
+            <section className="relative bg-zinc-100 rounded-2xl border border-zinc-200 overflow-hidden flex flex-col min-h-0">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse text-sm">
                         <thead>
-                            <tr className="bg-zinc-900/60 border-b border-zinc-800">
+                            <tr className="bg-zinc-50/95 border-b border-zinc-200">
                                 <th className="px-4 py-2.5 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Location</th>
                                 <th className="px-3 py-2.5 text-[10px] font-bold text-zinc-500 uppercase">Rent</th>
                                 <th className="px-3 py-2.5 text-[10px] font-bold text-zinc-500 uppercase">Food</th>
@@ -271,14 +272,14 @@ const ManageCosts = () => {
                                 <th className="px-4 py-2.5 text-[10px] font-bold text-zinc-500 uppercase text-right min-w-[5.5rem]">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-800/80">
+                        <tbody className="divide-y divide-zinc-200/80">
                             {filteredCosts.map((row) => (
-                                <tr key={row.id} className="hover:bg-zinc-800/30">
+                                <tr key={row.id} className="hover:bg-zinc-200/50">
                                     <td className="px-4 py-2 align-middle">
                                         <div className="flex items-center gap-2 min-w-0">
                                             <MapPin size={14} className="text-amber-500 shrink-0" />
                                             <div className="min-w-0">
-                                                <div className="text-white font-semibold truncate">{row.city}</div>
+                                                <div className="text-zinc-900 font-semibold truncate">{row.city}</div>
                                                 <div className="text-zinc-500 text-[11px] uppercase truncate">{row.country}</div>
                                             </div>
                                         </div>
@@ -289,7 +290,7 @@ const ManageCosts = () => {
                                             min="0"
                                             value={row.rent}
                                             onChange={(e) => updateCostField(row.id, 'rent', e.target.value)}
-                                            className="w-20 px-2 py-1 rounded-md bg-zinc-900 border border-zinc-700 text-white text-sm tabular-nums"
+                                            className="w-20 px-2 py-1 rounded-md bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm tabular-nums"
                                         />
                                     </td>
                                     <td className="px-3 py-2 align-middle">
@@ -298,7 +299,7 @@ const ManageCosts = () => {
                                             min="0"
                                             value={row.food}
                                             onChange={(e) => updateCostField(row.id, 'food', e.target.value)}
-                                            className="w-20 px-2 py-1 rounded-md bg-zinc-900 border border-zinc-700 text-white text-sm tabular-nums"
+                                            className="w-20 px-2 py-1 rounded-md bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm tabular-nums"
                                         />
                                     </td>
                                     <td className="px-3 py-2 align-middle">
@@ -307,7 +308,7 @@ const ManageCosts = () => {
                                             min="0"
                                             value={row.transport}
                                             onChange={(e) => updateCostField(row.id, 'transport', e.target.value)}
-                                            className="w-20 px-2 py-1 rounded-md bg-zinc-900 border border-zinc-700 text-white text-sm tabular-nums"
+                                            className="w-20 px-2 py-1 rounded-md bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm tabular-nums"
                                         />
                                     </td>
                                     <td className="px-3 py-2 align-middle">
@@ -316,7 +317,7 @@ const ManageCosts = () => {
                                             maxLength={3}
                                             value={String(row.currency || '').toUpperCase()}
                                             onChange={(e) => updateCostField(row.id, 'currency', e.target.value.toUpperCase())}
-                                            className="w-14 px-1.5 py-1 rounded-md bg-zinc-900 border border-zinc-700 text-white uppercase text-sm text-center"
+                                            className="w-14 px-1.5 py-1 rounded-md bg-zinc-50 border border-zinc-300 text-zinc-900 uppercase text-sm text-center"
                                         />
                                     </td>
                                     <td className="px-4 py-2 align-middle text-right">
@@ -332,7 +333,7 @@ const ManageCosts = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => setDeleteConfirmId(row.id)}
-                                                className="inline-flex items-center justify-center p-1.5 rounded-lg bg-zinc-800 hover:bg-red-950/80 border border-zinc-600 hover:border-red-800 text-zinc-300 hover:text-red-300"
+                                                className="inline-flex items-center justify-center p-1.5 rounded-lg bg-zinc-200 hover:bg-red-50 border border-zinc-300 hover:border-red-300 text-zinc-700 hover:text-red-600"
                                                 title="Delete"
                                             >
                                                 <Trash2 size={14} />
@@ -354,7 +355,7 @@ const ManageCosts = () => {
                 {saveToast && (
                     <div
                         role="status"
-                        className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl bg-emerald-950/95 border border-emerald-700/80 text-emerald-200 text-sm font-semibold shadow-lg z-20 pointer-events-none animate-in fade-in zoom-in-95 duration-200 max-w-[90%] text-center"
+                        className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm font-semibold shadow-lg z-20 pointer-events-none animate-in fade-in zoom-in-95 duration-200 max-w-[90%] text-center"
                     >
                         {saveToast}
                     </div>
@@ -372,17 +373,17 @@ const ManageCosts = () => {
             />
 
             {isAddModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#18181b] w-full max-w-lg rounded-2xl border border-zinc-800 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-                        <div className="p-5 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
-                            <h2 className="text-lg font-black text-white">Add living cost</h2>
-                            <button type="button" onClick={closeAddModal} className="text-zinc-500 hover:text-white p-1">
-                                <X size={22} />
+                <AdminModalShell>
+                    <div className="bg-zinc-100 w-full max-w-md rounded-xl border border-zinc-200 shadow-2xl overflow-hidden max-h-[min(85dvh,32rem)] flex flex-col">
+                        <div className="px-4 py-2.5 border-b border-zinc-200 flex justify-between items-center bg-zinc-50/80 shrink-0">
+                            <h2 className="text-base font-black text-zinc-900">Add living cost</h2>
+                            <button type="button" onClick={closeAddModal} className="text-zinc-500 hover:text-zinc-900 p-0.5">
+                                <X size={20} />
                             </button>
                         </div>
-                        <form onSubmit={addLivingCost} className="p-5 space-y-4 overflow-y-auto">
+                        <form onSubmit={addLivingCost} className="px-4 py-3 space-y-3 overflow-y-auto">
                             {costErrorMsg && (
-                                <p className="text-sm text-red-400 font-medium">{costErrorMsg}</p>
+                                <p className="text-sm text-red-600 font-medium">{costErrorMsg}</p>
                             )}
                             <div>
                                 <label className="block text-xs font-bold text-zinc-500 mb-1.5">City</label>
@@ -390,7 +391,7 @@ const ManageCosts = () => {
                                     required
                                     value={newLivingCost.city}
                                     onChange={(e) => setNewLivingCost((p) => ({ ...p, city: e.target.value }))}
-                                    className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200"
+                                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-800"
                                 >
                                     <option value="">Select city</option>
                                     {citiesWithUniversities.map((name) => (
@@ -405,7 +406,7 @@ const ManageCosts = () => {
                                 <select
                                     value={newLivingCost.lifestyle}
                                     onChange={(e) => setNewLivingCost((p) => ({ ...p, lifestyle: e.target.value }))}
-                                    className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200"
+                                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-800"
                                 >
                                     {LIFESTYLE_OPTIONS.map((life) => (
                                         <option key={life} value={life}>
@@ -414,7 +415,7 @@ const ManageCosts = () => {
                                     ))}
                                 </select>
                             </div>
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-3 gap-2">
                                 <div>
                                     <label className="block text-xs font-bold text-zinc-500 mb-1.5">Rent / mo</label>
                                     <input
@@ -423,7 +424,7 @@ const ManageCosts = () => {
                                         required
                                         value={newLivingCost.rent}
                                         onChange={(e) => setNewLivingCost((p) => ({ ...p, rent: e.target.value }))}
-                                        className="w-full px-3 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white"
+                                        className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900"
                                     />
                                 </div>
                                 <div>
@@ -434,7 +435,7 @@ const ManageCosts = () => {
                                         required
                                         value={newLivingCost.food}
                                         onChange={(e) => setNewLivingCost((p) => ({ ...p, food: e.target.value }))}
-                                        className="w-full px-3 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white"
+                                        className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900"
                                     />
                                 </div>
                                 <div>
@@ -445,7 +446,7 @@ const ManageCosts = () => {
                                         required
                                         value={newLivingCost.transport}
                                         onChange={(e) => setNewLivingCost((p) => ({ ...p, transport: e.target.value }))}
-                                        className="w-full px-3 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-white"
+                                        className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900"
                                     />
                                 </div>
                             </div>
@@ -455,7 +456,7 @@ const ManageCosts = () => {
                                     required
                                     value={newLivingCost.currency}
                                     onChange={(e) => setNewLivingCost((p) => ({ ...p, currency: e.target.value }))}
-                                    className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200"
+                                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-800"
                                 >
                                     <option value="">{currencies.length ? 'Select currency' : 'No currencies in currency_rates'}</option>
                                     {currencies.map((code) => (
@@ -465,18 +466,18 @@ const ManageCosts = () => {
                                     ))}
                                 </select>
                             </div>
-                            <div className="flex gap-3 pt-2">
+                            <div className="flex gap-2 pt-1">
                                 <button
                                     type="button"
                                     onClick={closeAddModal}
-                                    className="flex-1 py-3 rounded-xl bg-zinc-800 text-zinc-300 font-bold hover:bg-zinc-700"
+                                    className="flex-1 py-2 rounded-lg bg-zinc-200 text-sm text-zinc-700 font-bold hover:bg-zinc-300"
                                     disabled={isSaving}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-1 py-3 rounded-xl bg-amber-500 text-black font-bold hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 py-2 rounded-lg bg-amber-500 text-sm text-black font-bold hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed"
                                     disabled={isSaving}
                                 >
                                     {isSaving ? 'Creating...' : 'Create'}
@@ -484,7 +485,7 @@ const ManageCosts = () => {
                             </div>
                         </form>
                     </div>
-                </div>
+                </AdminModalShell>
             )}
         </div>
     );

@@ -62,7 +62,7 @@ const StudentDashboard = () => {
     const firstName = user.fullName ? user.fullName.split(' ')[0] : 'Student';
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6 pb-12 animate-in fade-in duration-700 text-slate-800">
+        <div className="max-w-6xl mx-auto space-y-4 pb-6 md:space-y-6 md:pb-12 animate-in fade-in duration-700 text-slate-800">
             <PageHeader
                 title="Dashboard"
                 subtitle={`Welcome back, ${firstName}`}
@@ -71,7 +71,7 @@ const StudentDashboard = () => {
                     <>
                         <button
                             onClick={() => navigate('/student/profile')}
-                            className="bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-xl px-6 py-2.5 transition-all shadow-md hover:shadow-lg"
+                            className="bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-lg md:rounded-xl px-3 py-2 text-xs md:px-6 md:py-2.5 md:text-base transition-all shadow-md hover:shadow-lg"
                         >
                             Update Profile
                         </button>
@@ -79,12 +79,12 @@ const StudentDashboard = () => {
                 }
             />
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
                 {/* Left Column (Main Stats & content) - Spans 8 cols */}
-                <div className="lg:col-span-8 space-y-8">
+                <div className="lg:col-span-8 space-y-5 md:space-y-8">
 
                     {/* Animated Glass Stats Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5">
                         <div className="relative group overflow-hidden bg-indigo-50 border border-indigo-100 p-3 rounded-[1.25rem] shadow-sm hover:shadow-md hover:shadow-indigo-200/50 transition-all duration-300 hover:-translate-y-1">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/40 rounded-full blur-xl group-hover:bg-white/60 transition-colors"></div>
                             <div className="flex items-start justify-between mb-0.5">
@@ -141,11 +141,11 @@ const StudentDashboard = () => {
                     </div>
 
                     {/* Saved Content Grid: Programs & Scholarships */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         {/* Saved Programs Card Container */}
-                        <div className="bg-white/80 backdrop-blur-3xl border border-white/50 p-6 rounded-[2.5rem] shadow-xl flex flex-col">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-black text-slate-800 flex items-center gap-3">
+                        <div className="bg-white/80 backdrop-blur-3xl border border-white/50 p-4 rounded-2xl shadow-xl md:p-6 md:rounded-[2.5rem] flex flex-col">
+                            <div className="flex items-center justify-between mb-4 md:mb-6">
+                                <h2 className="text-lg md:text-xl font-black text-slate-800 flex items-center gap-2 md:gap-3">
                                     <div className="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl shadow-inner">
                                         <BookmarkCheck size={20} />
                                     </div>
@@ -161,7 +161,7 @@ const StudentDashboard = () => {
                                     <div
                                         key={program.id}
                                         onClick={() => navigate(`/student/program/${program.program_id ?? program.id}`)}
-                                        className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-lg transition-all cursor-pointer group border-l-4 border-l-indigo-500 hover:-translate-y-1"
+                                        className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-lg transition-all cursor-pointer group border-l-4 border-l-indigo-500 hover:-translate-y-1 md:gap-4 md:p-4 md:rounded-2xl"
                                     >
                                         <div className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center bg-indigo-50 group-hover:bg-indigo-100 transition-colors">
                                             <Building2 className="text-indigo-500" size={22} />
@@ -187,9 +187,9 @@ const StudentDashboard = () => {
                         </div>
 
                         {/* Saved Scholarships Card Container */}
-                        <div className="bg-white/80 backdrop-blur-3xl border border-white/50 p-6 rounded-[2.5rem] shadow-xl flex flex-col">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-black text-slate-800 flex items-center gap-3">
+                        <div className="bg-white/80 backdrop-blur-3xl border border-white/50 p-4 rounded-2xl shadow-xl md:p-6 md:rounded-[2.5rem] flex flex-col">
+                            <div className="flex items-center justify-between mb-4 md:mb-6">
+                                <h2 className="text-lg md:text-xl font-black text-slate-800 flex items-center gap-2 md:gap-3">
                                     <div className="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl shadow-inner">
                                         <Award size={20} />
                                     </div>
@@ -205,7 +205,7 @@ const StudentDashboard = () => {
                                     <div
                                         key={scholarship.id}
                                         onClick={() => navigate(`/student/scholarships/${scholarship.scholarship_id ?? scholarship.id}`)}
-                                        className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-emerald-200 shadow-sm hover:shadow-lg transition-all cursor-pointer group border-l-4 border-l-emerald-500 hover:-translate-y-1"
+                                        className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:border-emerald-200 shadow-sm hover:shadow-lg transition-all cursor-pointer group border-l-4 border-l-emerald-500 hover:-translate-y-1 md:gap-4 md:p-4 md:rounded-2xl"
                                     >
                                         <div className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center bg-emerald-50 group-hover:bg-emerald-100 transition-colors">
                                             <DollarSign className="text-emerald-500" size={22} />
@@ -229,18 +229,18 @@ const StudentDashboard = () => {
                 </div>
 
                 {/* Right Column (Sidebar Widgets) - Spans 4 cols */}
-                <div className="lg:col-span-4 space-y-6 max-h-[528px]">
+                <div className="lg:col-span-4 space-y-4 md:space-y-6 max-h-[528px]">
 
                     {/* Premium Deadline Widget */}
-                    <div className="bg-white/80 backdrop-blur-3xl border border-white/50 p-6 rounded-[2.5rem] shadow-xl relative flex flex-col h-full max-h-[528px] overflow-hidden">
+                    <div className="bg-white/80 backdrop-blur-3xl border border-white/50 p-4 rounded-2xl shadow-xl relative flex flex-col h-full max-h-[528px] overflow-hidden md:p-6 md:rounded-[2.5rem]">
 
                         {/* Header */}
-                        <div className="flex items-center gap-3 mb-6 relative z-10">
+                        <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 relative z-10">
                             <div className="bg-red-100/80 text-red-600 p-2.5 rounded-xl shadow-inner">
                                 <Clock size={20} />
                             </div>
                             <div>
-                                <h3 className="font-black text-xl text-slate-800">Deadlines</h3>
+                                <h3 className="font-black text-lg md:text-xl text-slate-800">Deadlines</h3>
                             </div>
                         </div>
 
@@ -251,7 +251,7 @@ const StudentDashboard = () => {
                                 <div
                                     key={idx}
                                     onClick={() => navigate(`/student/program/${item.program_id}`)}
-                                    className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-red-200 shadow-sm hover:shadow-lg transition-all cursor-pointer group border-l-4 border-l-red-500 hover:-translate-y-1"
+                                    className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:border-red-200 shadow-sm hover:shadow-lg transition-all cursor-pointer group border-l-4 border-l-red-500 hover:-translate-y-1 md:gap-4 md:p-4 md:rounded-2xl"
                                 >
                                     <div className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center bg-red-50 group-hover:bg-red-100 transition-colors flex-col">
                                         <span className="text-[9px] font-bold text-red-500 uppercase leading-none">
@@ -284,7 +284,7 @@ const StudentDashboard = () => {
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 

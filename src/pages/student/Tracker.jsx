@@ -92,7 +92,7 @@ const Tracker = () => {
 
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6 pb-12 animate-in fade-in duration-500 h-full flex flex-col">
+        <div className="max-w-6xl mx-auto space-y-4 pb-6 md:space-y-6 md:pb-12 animate-in fade-in duration-500 h-full flex flex-col">
             <PageHeader
                 title="Application Tracker"
                 subtitle={`Track your applications easily`}
@@ -100,7 +100,7 @@ const Tracker = () => {
                 actions={
                     <button
                         onClick={() => navigate('/student/explore')}
-                        className="bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-xl px-6 py-2.5 transition-all shadow-md hover:shadow-lg"
+                        className="bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-lg md:rounded-xl px-4 py-2 text-sm md:px-6 md:py-2.5 md:text-base transition-all shadow-md hover:shadow-lg"
                     >
                         Add Application
                     </button>
@@ -108,32 +108,32 @@ const Tracker = () => {
             />
 
             {/* Kanban Board */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-5 items-start">
                 {statuses.map(status => {
                     const columnApps = applications.filter(a => a.status === status);
                     return (
                         <div
                             key={status}
-                            className="bg-white/70 backdrop-blur-xl border border-white/70 rounded-3xl shadow-sm p-4 flex flex-col max-h-[68vh]"
+                            className="bg-white/70 backdrop-blur-xl border border-white/70 rounded-2xl md:rounded-3xl shadow-sm p-3 md:p-4 flex flex-col max-h-[72vh] md:max-h-[68vh]"
                         >
                             {/* Column Header */}
-                            <div className={`p-4 rounded-2xl ${getStatusHeaderStyles(status)} flex items-center justify-between mb-4`}>
-                                <div className="flex items-center gap-2.5 font-black uppercase tracking-wide text-sm text-slate-900">
+                            <div className={`p-3 md:p-4 rounded-xl md:rounded-2xl ${getStatusHeaderStyles(status)} flex items-center justify-between mb-3 md:mb-4`}>
+                                <div className="flex items-center gap-2 md:gap-2.5 font-black uppercase tracking-wide text-xs md:text-sm text-slate-900">
                                     <div className={`p-1.5 rounded-lg ${getStatusAccentStyles(status)}`}>
                                         {getStatusIcon(status)}
                                     </div>
                                     {statusLabels[status]}
                                 </div>
-                                <span className={`px-3 py-1 rounded-lg text-sm font-black ${getStatusAccentStyles(status)}`}>
+                                <span className={`px-2 py-0.5 md:px-3 md:py-1 rounded-md md:rounded-lg text-xs md:text-sm font-black ${getStatusAccentStyles(status)}`}>
                                     {columnApps.length}
                                 </span>
                             </div>
 
-                            <div className="space-y-3 overflow-y-auto pr-1 flex-1">
+                            <div className="space-y-2 md:space-y-3 overflow-y-auto pr-1 flex-1">
                                 {columnApps.map(app => (
                                     <div
                                         key={app.id}
-                                        className={`p-4 rounded-2xl group relative transition-all border ${
+                                        className={`p-3 md:p-4 rounded-xl md:rounded-2xl group relative transition-all border ${
                                             status === 'pending'
                                                 ? 'bg-white border-indigo-100 hover:border-indigo-300 hover:shadow-md'
                                                 : status === 'accepted'

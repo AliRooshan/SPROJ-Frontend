@@ -113,7 +113,7 @@ const Auth = () => {
     };
 
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
+        <div className="min-h-screen relative flex items-center justify-center p-3 sm:p-4 overflow-hidden">
             {/* Background Image */}
             <div className="absolute inset-0">
                 <img
@@ -140,11 +140,11 @@ const Auth = () => {
                             initial="enter"
                             animate="center"
                             exit="exit"
-                            className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-indigo-100 p-8"
+                            className="bg-white/80 backdrop-blur-xl rounded-2xl md:rounded-3xl shadow-2xl border-2 border-indigo-100 p-5 md:p-8"
                         >
                             {/* Header */}
-                            <div className="mb-6">
-                                <h2 className="text-3xl font-black text-slate-900 mb-2 flex items-center gap-2">
+                            <div className="mb-4 md:mb-6">
+                                <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-1 md:mb-2 flex items-center gap-2">
                                     {isSignUp ? (
                                         <>
                                             Create Account
@@ -155,7 +155,7 @@ const Auth = () => {
                                         </>
                                     )}
                                 </h2>
-                                <p className="text-slate-600">
+                                <p className="text-slate-600 text-sm md:text-base">
                                     {isSignUp
                                         ? 'Start your educational journey today'
                                         : 'Continue your journey to success'}
@@ -177,7 +177,7 @@ const Auth = () => {
                             </AnimatePresence>
 
                             {/* Form */}
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                            <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
                                 {isSignUp && (
                                     <motion.div
                                         initial={{ opacity: 0, x: -20 }}
@@ -195,7 +195,7 @@ const Auth = () => {
                                                 value={formData.fullName}
                                                 onChange={handleInputChange}
                                                 required={isSignUp}
-                                                className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-indigo-100 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-slate-900 font-medium placeholder-slate-400"
+                                                className="w-full pl-12 pr-4 py-2.5 md:py-3.5 bg-white border-2 border-indigo-100 rounded-lg md:rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm md:text-base text-slate-900 font-medium placeholder-slate-400"
                                             />
                                         </div>
                                     </motion.div>
@@ -219,7 +219,7 @@ const Auth = () => {
                                             value={formData.email}
                                             onChange={handleInputChange}
                                             required
-                                            className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-indigo-100 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-slate-900 font-medium placeholder-slate-400"
+                                            className="w-full pl-12 pr-4 py-2.5 md:py-3.5 bg-white border-2 border-indigo-100 rounded-lg md:rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm md:text-base text-slate-900 font-medium placeholder-slate-400"
                                             placeholder="you@example.com"
                                         />
                                     </div>
@@ -241,7 +241,7 @@ const Auth = () => {
                                             value={formData.password}
                                             onChange={handleInputChange}
                                             required
-                                            className={`w-full pl-12 ${!isSignUp ? 'pr-12' : 'pr-4'} py-3.5 bg-white border-2 border-indigo-100 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-slate-900 font-medium placeholder-slate-400`}
+                                            className={`w-full pl-12 ${!isSignUp ? 'pr-12' : 'pr-4'} py-2.5 md:py-3.5 bg-white border-2 border-indigo-100 rounded-lg md:rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm md:text-base text-slate-900 font-medium placeholder-slate-400`}
                                             placeholder="••••••••"
                                         />
                                         {!isSignUp && (
@@ -273,7 +273,7 @@ const Auth = () => {
                                                 value={formData.confirmPassword}
                                                 onChange={handleInputChange}
                                                 required={isSignUp}
-                                                className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-indigo-100 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-slate-900 font-medium placeholder-slate-400"
+                                                className="w-full pl-12 pr-4 py-2.5 md:py-3.5 bg-white border-2 border-indigo-100 rounded-lg md:rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm md:text-base text-slate-900 font-medium placeholder-slate-400"
                                                 placeholder="Confirm your password"
                                             />
                                         </div>
@@ -284,7 +284,7 @@ const Auth = () => {
                                 <motion.button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full mt-6 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
+                                    className="w-full mt-4 md:mt-6 py-3 md:py-4 text-sm md:text-base bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold rounded-lg md:rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                 >
@@ -300,8 +300,8 @@ const Auth = () => {
                             </form>
 
                             {/* Toggle Mode */}
-                            <div className="mt-6 text-center">
-                                <p className="text-slate-600">
+                            <div className="mt-4 md:mt-6 text-center">
+                                <p className="text-slate-600 text-sm md:text-base">
                                     {isSignUp ? 'Already have an account?' : "Don't have an account?"}
                                     {' '}
                                     <button
@@ -319,7 +319,7 @@ const Auth = () => {
 
                 {/* Footer */}
                 <motion.p
-                    className="text-center text-slate-500 text-sm mt-8"
+                    className="text-center text-slate-500 text-xs md:text-sm mt-6 md:mt-8"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
