@@ -82,24 +82,46 @@ const VisaGuidance = () => {
         <div className="max-w-6xl mx-auto space-y-4 pb-6 md:space-y-6 md:pb-12 animate-in fade-in duration-500">
             <PageHeader
                 title="Visa Guidance"
-                subtitle={`Step-by-step roadmap for ${selectedCountry || 'your destination'}`}
+                subtitle={
+                    <>
+                        <span className="md:hidden">Step-by-step roadmap</span>
+                        <span className="hidden md:inline">Step-by-step roadmap for {selectedCountry || 'your destination'}</span>
+                    </>
+                }
                 icon={null}
+                forceRow={true}
                 actions={
                     countries.length > 0 && (
-                        <div className="bg-black/20 backdrop-blur-md rounded-full p-1 border border-white/10 inline-flex items-center shadow-inner ring-1 ring-white/5">
-                            {countries.map(c => (
-                                <button
-                                    key={c}
-                                    onClick={() => setSelectedCountry(c)}
-                                    className={`px-4 py-1.5 rounded-full text-sm font-bold transition-all ${selectedCountry === c
-                                        ? 'bg-indigo-50/95 text-indigo-900 shadow-md border border-white/60'
-                                        : 'text-white/80 hover:text-white hover:bg-white/10 border border-transparent'
-                                        }`}
+                        <>
+                            {/* Mobile Dropdown */}
+                            <div className="md:hidden">
+                                <select
+                                    value={selectedCountry || ''}
+                                    onChange={(e) => setSelectedCountry(e.target.value)}
+                                    className="bg-indigo-50/95 text-indigo-900 text-xs font-bold rounded-lg px-2.5 py-1.5 outline-none shadow-sm border border-indigo-100 cursor-pointer"
                                 >
-                                    {c}
-                                </button>
-                            ))}
-                        </div>
+                                    {countries.map(c => (
+                                        <option key={c} value={c}>{c}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            
+                            {/* Desktop Pills */}
+                            <div className="hidden md:inline-flex bg-black/20 backdrop-blur-md rounded-full p-1 border border-white/10 items-center shadow-inner ring-1 ring-white/5">
+                                {countries.map(c => (
+                                    <button
+                                        key={c}
+                                        onClick={() => setSelectedCountry(c)}
+                                        className={`px-4 py-1.5 rounded-full text-sm font-bold transition-all ${selectedCountry === c
+                                            ? 'bg-indigo-50/95 text-indigo-900 shadow-md border border-white/60'
+                                            : 'text-white/80 hover:text-white hover:bg-white/10 border border-transparent'
+                                            }`}
+                                    >
+                                        {c}
+                                    </button>
+                                ))}
+                            </div>
+                        </>
                     )
                 }
             />
@@ -143,9 +165,9 @@ const VisaGuidance = () => {
                                     </div>
                                     <div className="flex-grow min-w-0">
                                         <div className="flex justify-between items-start gap-2">
-                                            <h3 className="text-base font-bold text-slate-800">{step.title}</h3>
+                                            <h3 className="text-base font-medium text-slate-800">{step.title}</h3>
                                             {step.duration && String(step.duration).toUpperCase() !== 'TBD' && (
-                                                <span className="text-xs font-bold bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg uppercase tracking-wide shrink-0">{step.duration}</span>
+                                                <span className="text-xs font-medium bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg uppercase tracking-wide shrink-0">{step.duration}</span>
                                             )}
                                         </div>
                                         <p className="text-sm text-slate-500 font-medium leading-relaxed mt-1">{step.description}</p>

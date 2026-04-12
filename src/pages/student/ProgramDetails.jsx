@@ -96,13 +96,14 @@ const ProgramDetails = () => {
                 title={program.program}
                 subtitle={`${program.university} · ${program.city}, ${program.country}`}
                 icon={GraduationCap}
+                forceRow={true}
                 actions={
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 px-4 py-2 bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-xl transition-all border border-white/50 backdrop-blur-md shadow-sm"
+                        className="flex items-center justify-center gap-2 w-10 h-10 md:w-auto md:h-auto !p-0 md:!px-4 md:!py-2 bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-xl transition-all border border-white/50 backdrop-blur-md shadow-sm shrink-0"
                     >
                         <ChevronLeft size={18} />
-                        Back
+                        <span className="hidden md:inline">Back</span>
                     </button>
                 }
             />
@@ -121,7 +122,7 @@ const ProgramDetails = () => {
                             handleAddToTracker();
                         }
                     }}
-                    className={`flex items-center gap-2.5 px-7 py-3 font-bold rounded-xl transition-all shadow-lg text-sm ${existingApplication
+                    className={`flex items-center justify-center gap-2.5 px-5 py-2.5 md:px-7 md:py-3 font-bold rounded-xl transition-all shadow-lg text-[13px] md:text-sm shrink-0 ${existingApplication
                         ? existingApplication.status === 'accepted'
                             ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 shadow-emerald-50'
                             : existingApplication.status === 'rejected'
@@ -130,30 +131,39 @@ const ProgramDetails = () => {
                         : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white hover:shadow-xl hover:shadow-purple-200 hover:-translate-y-0.5'
                         }`}
                 >
-                    {existingApplication
-                        ? (existingApplication.status === 'accepted' ? <CheckCircle size={18} /> : existingApplication.status === 'rejected' ? <XCircle size={18} /> : <Bookmark fill="currentColor" size={18} />)
-                        : <PlusCircle size={18} />}
-                    {existingApplication
-                        ? (existingApplication.status === 'accepted' ? 'Accepted' : existingApplication.status === 'rejected' ? 'Rejected' : 'Cancel Application')
-                        : 'Start Application'}
+                    <div className="hidden md:flex items-center">
+                        {existingApplication
+                            ? (existingApplication.status === 'accepted' ? <CheckCircle size={18} /> : existingApplication.status === 'rejected' ? <XCircle size={18} /> : <Bookmark fill="currentColor" size={18} />)
+                            : <PlusCircle size={18} />}
+                    </div>
+                    <span className="md:hidden tracking-wide">
+                        {existingApplication
+                            ? (existingApplication.status === 'accepted' ? 'Accepted' : existingApplication.status === 'rejected' ? 'Rejected' : 'Cancel')
+                            : 'Apply'}
+                    </span>
+                    <span className="hidden md:inline">
+                        {existingApplication
+                            ? (existingApplication.status === 'accepted' ? 'Accepted' : existingApplication.status === 'rejected' ? 'Rejected' : 'Cancel Application')
+                            : 'Start Application'}
+                    </span>
                 </button>
                 <button
                     onClick={() => { window.open(program.website || program.url || '#', '_blank'); }}
-                    className="flex items-center gap-2 px-5 py-3 bg-transparent text-indigo-600 font-bold rounded-xl border-2 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all text-sm"
+                    className="flex items-center justify-center gap-2 w-11 h-11 md:w-auto md:h-auto !p-0 md:!px-5 md:!py-3 bg-transparent text-indigo-600 font-bold rounded-xl border-2 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all text-sm shrink-0"
                 >
                     <ExternalLink size={16} />
-                    Visit Website
+                    <span className="hidden md:inline">Visit Website</span>
                 </button>
                 <div className="flex-1" />
                 <button
                     onClick={handleSave}
-                    className={`flex items-center gap-2 px-5 py-3 font-bold rounded-xl transition-all text-sm border-2 shadow-sm ${isSaved
+                    className={`flex items-center justify-center gap-2 w-11 h-11 md:w-auto md:h-auto !p-0 md:!px-5 md:!py-3 font-bold rounded-xl transition-all text-sm border-2 shadow-sm shrink-0 ${isSaved
                         ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100 hover:border-red-300 shadow-red-50'
                         : 'bg-white border-indigo-200 text-indigo-600 hover:border-indigo-400 hover:bg-indigo-50 shadow-slate-100'
                         }`}
                 >
                     <Bookmark size={18} fill={isSaved ? "currentColor" : "none"} />
-                    {isSaved ? 'Unsave Program' : 'Save Program'}
+                    <span className="hidden md:inline">{isSaved ? 'Unsave Program' : 'Save Program'}</span>
                 </button>
             </div>
 
@@ -169,18 +179,18 @@ const ProgramDetails = () => {
                     </div>
 
                     {/* Compact stat chips — above description */}
-                    <div className="flex items-stretch gap-2.5">
-                        <div className="flex flex-col px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Duration</span>
-                            <span className="text-s font-black text-slate-800">{program.duration || 'N/A'}</span>
+                    <div className="flex items-stretch gap-2 md:gap-2.5 w-full">
+                        <div className="flex flex-col px-2.5 py-2 md:px-3.5 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Duration</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 truncate">{program.duration || 'N/A'}</span>
                         </div>
-                        <div className="flex flex-col px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Intake</span>
-                            <span className="text-s font-black text-slate-800">{formatDate(program.deadline)}</span>
+                        <div className="flex flex-col px-2.5 py-2 md:px-3.5 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Intake</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 truncate">{formatDate(program.deadline)}</span>
                         </div>
-                        <div className="flex flex-col px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Tuition</span>
-                            <span className="text-s font-black text-slate-800">
+                        <div className="flex flex-col px-2.5 py-2 md:px-3.5 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Tuition</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 truncate">
                                 {program.tuition != null ? `$${Number(program.tuition).toLocaleString()}` : 'N/A'}
                             </span>
                         </div>

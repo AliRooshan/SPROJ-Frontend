@@ -67,13 +67,15 @@ const StudentDashboard = () => {
                 title="Dashboard"
                 subtitle={`Welcome back, ${firstName}`}
                 icon={LayoutDashboard}
+                forceRow={true}
                 actions={
                     <>
                         <button
                             onClick={() => navigate('/student/profile')}
-                            className="bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-lg md:rounded-xl px-3 py-2 text-xs md:px-6 md:py-2.5 md:text-base transition-all shadow-md hover:shadow-lg"
+                            className="bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-lg md:rounded-xl w-10 h-10 !p-0 md:!px-6 md:!py-2.5 md:w-auto md:h-auto md:text-base transition-all shadow-md hover:shadow-lg flex items-center justify-center"
                         >
-                            Update Profile
+                            <span className="hidden md:inline">Update Profile</span>
+                            <span className="md:hidden text-lg leading-none">👤</span>
                         </button>
                     </>
                 }
@@ -84,8 +86,8 @@ const StudentDashboard = () => {
                 <div className="lg:col-span-8 space-y-5 md:space-y-8">
 
                     {/* Animated Glass Stats Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5">
-                        <div className="relative group overflow-hidden bg-indigo-50 border border-indigo-100 p-3 rounded-[1.25rem] shadow-sm hover:shadow-md hover:shadow-indigo-200/50 transition-all duration-300 hover:-translate-y-1">
+                    <div className="grid grid-cols-3 gap-2 md:gap-5">
+                        <div className="relative group overflow-hidden bg-indigo-50 border border-indigo-100 p-2 md:p-3 rounded-xl md:rounded-[1.25rem] shadow-sm hover:shadow-md hover:shadow-indigo-200/50 transition-all duration-300 hover:-translate-y-1">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/40 rounded-full blur-xl group-hover:bg-white/60 transition-colors"></div>
                             <div className="flex items-start justify-between mb-0.5">
                                 <div className="p-1.5 bg-white text-indigo-600 rounded-lg group-hover:scale-110 transition-transform shadow-sm relative z-10">
@@ -103,7 +105,7 @@ const StudentDashboard = () => {
                             </div>
                         </div>
 
-                        <div className="relative group overflow-hidden bg-amber-50 border border-amber-100 p-3 rounded-[1.25rem] shadow-sm hover:shadow-md hover:shadow-amber-200/50 transition-all duration-300 hover:-translate-y-1">
+                        <div className="relative group overflow-hidden bg-amber-50 border border-amber-100 p-2 md:p-3 rounded-xl md:rounded-[1.25rem] shadow-sm hover:shadow-md hover:shadow-amber-200/50 transition-all duration-300 hover:-translate-y-1">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/40 rounded-full blur-xl group-hover:bg-white/60 transition-colors"></div>
                             <div className="flex items-start justify-between mb-0.5">
                                 <div className="p-1.5 bg-white text-amber-600 rounded-lg group-hover:scale-110 transition-transform shadow-sm relative z-10">
@@ -121,7 +123,7 @@ const StudentDashboard = () => {
                             </div>
                         </div>
 
-                        <div className="relative group overflow-hidden bg-emerald-50 border border-emerald-100 p-3 rounded-[1.25rem] shadow-sm hover:shadow-md hover:shadow-emerald-200/50 transition-all duration-300 hover:-translate-y-1">
+                        <div className="relative group overflow-hidden bg-emerald-50 border border-emerald-100 p-2 md:p-3 rounded-xl md:rounded-[1.25rem] shadow-sm hover:shadow-md hover:shadow-emerald-200/50 transition-all duration-300 hover:-translate-y-1">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/40 rounded-full blur-xl group-hover:bg-white/60 transition-colors"></div>
                             <div className="flex items-start justify-between mb-0.5">
                                 <div className="p-1.5 bg-white text-emerald-600 rounded-lg group-hover:scale-110 transition-transform shadow-sm relative z-10">

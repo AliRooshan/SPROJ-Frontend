@@ -327,16 +327,15 @@ const AdminDashboard = () => {
         <div className="space-y-4 md:space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight">Dashboard</h1>
-                    <p className="text-zinc-600 font-medium">Overview of your platform's performance.</p>
+            <div className="flex flex-row justify-between items-start md:items-center gap-4 group">
+                <div className="flex-1 min-w-0">
+                    <h1 className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight truncate">Dashboard</h1>
+                    <p className="text-zinc-600 font-medium text-xs md:text-sm mt-1 mb-0.5 truncate max-w-full">Overview of your platform's performance.</p>
                 </div>
-                <div className="flex items-center gap-3 relative">
-
-                    <div className="px-4 py-2.5 rounded-xl bg-zinc-200 border border-zinc-300 flex items-center gap-2 text-sm font-bold text-zinc-700">
-                        <Calendar size={16} />
-                        <span>{new Date().toLocaleDateString()}</span>
+                <div className="flex items-center gap-3 relative shrink-0">
+                    <div className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-zinc-200 border border-zinc-300 flex items-center gap-2 text-xs md:text-sm font-bold text-zinc-700">
+                        <Calendar size={16} className="shrink-0" />
+                        <span className="whitespace-nowrap">{new Date().toLocaleDateString()}</span>
                     </div>
                 </div>
             </div>

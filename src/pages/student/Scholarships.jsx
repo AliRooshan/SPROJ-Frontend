@@ -6,6 +6,11 @@ import AuthService from '../../services/AuthService';
 import api from '../../services/api';
 
 
+const formatDate = (dateString) => {
+    if (!dateString) return 'TBA';
+    return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+};
+
 const Scholarships = () => {
     const navigate = useNavigate();
     const [scholarships, setScholarships] = useState([]);
@@ -88,9 +93,9 @@ const Scholarships = () => {
                 subtitle="Discover funding opportunities tailored for your profile"
                 icon={Award}
                 actions={
-                    <div className="flex flex-col w-full gap-2 md:flex-row md:items-center md:gap-3 md:w-auto">
+                    <div className="flex flex-row items-center w-full gap-2 md:gap-3 md:w-auto">
                         {/* Compact Search Bar */}
-                        <div className="relative w-full max-w-xs sm:max-w-none sm:w-64 group">
+                        <div className="relative flex-1 min-w-0 md:w-64 group">
                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <Search className="text-indigo-500 group-focus-within:text-indigo-600 transition-colors" size={16} />
                             </div>
@@ -99,17 +104,16 @@ const Scholarships = () => {
                                 placeholder="Search..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="block w-full pl-10 pr-4 py-2.5 bg-indigo-50/95 hover:bg-white focus:bg-white text-indigo-950 placeholder-indigo-600 rounded-xl outline-none transition-all text-sm font-bold shadow-md focus:shadow-lg"
+                                className="block w-full pl-10 pr-4 h-11 md:h-[46px] bg-indigo-50/95 hover:bg-white focus:bg-white text-indigo-950 placeholder-indigo-600 rounded-xl outline-none transition-all text-sm font-bold shadow-md focus:shadow-lg"
                             />
                         </div>
-
                         {/* Compact Filter Button */}
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className={`p-2.5 rounded-xl transition-all relative flex items-center justify-center shadow-md hover:shadow-lg ${showFilters ? 'bg-white text-indigo-700' : 'bg-indigo-50/95 text-indigo-900 hover:bg-white'}`}
+                            className={`h-11 w-11 md:h-[46px] md:w-[46px] !p-0 rounded-xl transition-all relative flex items-center justify-center shadow-md hover:shadow-lg shrink-0 ${showFilters ? 'bg-white text-indigo-700' : 'bg-indigo-50/95 text-indigo-900 hover:bg-white'}`}
                             title="Filters"
                         >
-                            <Filter size={18} />
+                            <Filter size={20} />
                             {activeFilterCount > 0 && (
                                 <span className="absolute -top-1.5 -right-1.5 bg-pink-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-md">
                                     {activeFilterCount}
@@ -129,7 +133,7 @@ const Scholarships = () => {
                     )}
 
                     {/* Country Pill */}
-                    <div className="relative z-40">
+                    <div className={`relative ${activeDropdown === 'country' ? 'z-50' : 'z-40'}`}>
                         <button
                             onClick={() => setActiveDropdown(activeDropdown === 'country' ? null : 'country')}
                             className={`flex items-center gap-2 px-4 h-[40px] rounded-full text-sm font-bold transition-all border outline-none ${selectedCountries.length > 0 || activeDropdown === 'country' ? 'bg-purple-100 border-purple-200 text-purple-700 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}
@@ -138,7 +142,7 @@ const Scholarships = () => {
                             Country {selectedCountries.length > 0 && `(${selectedCountries.length})`}
                             <ChevronDown size={14} className={`transition-transform opacity-70 ml-0.5 ${activeDropdown === 'country' ? 'rotate-180' : ''}`} />
                         </button>
-                        
+
                         {activeDropdown === 'country' && (
                             <div className="absolute top-full left-0 mt-2 w-56 bg-white flex flex-col rounded-2xl shadow-xl shadow-slate-200 border border-slate-100 p-2 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
                                 {countries.filter(c => c !== 'All').map(c => (
@@ -158,7 +162,7 @@ const Scholarships = () => {
                     </div>
 
                     {/* Type Pill */}
-                    <div className="relative z-40">
+                    <div className={`relative ${activeDropdown === 'type' ? 'z-50' : 'z-40'}`}>
                         <button
                             onClick={() => setActiveDropdown(activeDropdown === 'type' ? null : 'type')}
                             className={`flex items-center gap-2 px-4 h-[40px] rounded-full text-sm font-bold transition-all border outline-none ${selectedTypes.length > 0 || activeDropdown === 'type' ? 'bg-purple-100 border-purple-200 text-purple-700 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}
@@ -167,7 +171,7 @@ const Scholarships = () => {
                             Type {selectedTypes.length > 0 && `(${selectedTypes.length})`}
                             <ChevronDown size={14} className={`transition-transform opacity-70 ml-0.5 ${activeDropdown === 'type' ? 'rotate-180' : ''}`} />
                         </button>
-                        
+
                         {activeDropdown === 'type' && (
                             <div className="absolute top-full left-0 mt-2 w-56 bg-white flex flex-col rounded-2xl shadow-xl shadow-slate-200 border border-slate-100 p-2 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
                                 {types.filter(c => c !== 'All').map(t => (
@@ -187,7 +191,7 @@ const Scholarships = () => {
                     </div>
 
                     {/* Sort Pill */}
-                    <div className="relative z-40">
+                    <div className={`relative ${activeDropdown === 'sort' ? 'z-50' : 'z-40'}`}>
                         <button
                             onClick={() => setActiveDropdown(activeDropdown === 'sort' ? null : 'sort')}
                             className={`flex items-center gap-2 px-4 h-[40px] rounded-full text-sm font-bold transition-all border outline-none ${sortBy !== 'id' || activeDropdown === 'sort' ? 'bg-purple-100 border-purple-200 text-purple-700 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}
@@ -196,7 +200,7 @@ const Scholarships = () => {
                             Sort: {sortBy === 'amount_high' ? 'Amount: High to Low' : sortBy === 'amount_low' ? 'Amount: Low to High' : 'Default'}
                             <ChevronDown size={14} className={`transition-transform opacity-70 ml-0.5 ${activeDropdown === 'sort' ? 'rotate-180' : ''}`} />
                         </button>
-                        
+
                         {activeDropdown === 'sort' && (
                             <div className="absolute top-full left-0 mt-2 w-56 bg-white flex flex-col rounded-2xl shadow-xl shadow-slate-200 border border-slate-100 p-2 animate-in fade-in zoom-in-95 duration-150">
                                 {[
@@ -214,7 +218,7 @@ const Scholarships = () => {
                             </div>
                         )}
                     </div>
-                    
+
                     {/* Clear Filters (if any) */}
                     {activeFilterCount > 0 && (
                         <button
@@ -282,7 +286,7 @@ const Scholarships = () => {
                                     </div>
                                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
                                         <Calendar size={16} className="text-slate-400" />
-                                        <span className="truncate">{item.deadline}</span>
+                                        <span className="truncate">{formatDate(item.deadline)}</span>
                                     </div>
                                 </div>
                             </div>

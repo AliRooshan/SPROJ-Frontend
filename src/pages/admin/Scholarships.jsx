@@ -33,9 +33,9 @@ const normalizeRequirementsInput = (raw) => {
         .join('\n');
 };
 
-const formatDate = (value) => {
-    if (!value) return '—';
-    return new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+const formatDate = (dateString) => {
+    if (!dateString) return 'TBA';
+    return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 };
 
 const ManageScholarships = () => {
@@ -205,19 +205,23 @@ const ManageScholarships = () => {
 
     return (
         <div className="space-y-4 md:space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight">Scholarships</h1>
-                    <p className="text-zinc-600 font-medium">Manage normalized scholarship records from database.</p>
+            <div className="flex flex-row justify-between items-start md:items-center gap-4 group">
+                <div className="flex-1 min-w-0">
+                    <h1 className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight truncate">Scholarships</h1>
+                    <p className="text-zinc-600 font-medium text-xs md:text-sm mt-1 mb-0.5 truncate max-w-full">Manage normalized scholarship records from database.</p>
                 </div>
-                <button onClick={openAddModal} className="flex items-center gap-2 px-5 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/12 transition-all hover:-translate-y-0.5">
-                    <Plus size={18} />
-                    <span>Add Scholarship</span>
+                <button 
+                    onClick={openAddModal} 
+                    className="flex items-center justify-center gap-2 w-10 h-10 md:w-auto md:h-auto !p-0 md:!px-5 md:!py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/12 transition-all hover:-translate-y-0.5 shrink-0"
+                >
+                    <Plus size={20} className="md:hidden shrink-0" />
+                    <Plus size={18} className="hidden md:inline shrink-0" />
+                    <span className="hidden md:inline">Add Scholarship</span>
                 </button>
             </div>
 
-            <div className="bg-zinc-100 p-4 rounded-2xl border border-zinc-200 flex flex-col lg:flex-row gap-4">
-                <div className="flex-1 relative">
+            <div className="bg-zinc-100 p-3 md:p-4 rounded-2xl border border-zinc-200 flex flex-row gap-3 md:gap-4 items-stretch">
+                <div className="flex-1 relative min-w-0">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={20} />
                     <input type="text" placeholder="Search by name, provider..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-12 pr-4 py-3 bg-zinc-50/80 border border-zinc-300 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50" />
                 </div>
@@ -226,16 +230,16 @@ const ManageScholarships = () => {
                         <Filter size={18} />
                     </button>
                     {showFilterDropdown && (
-                        <div className="absolute right-0 top-14 w-72 bg-zinc-100 border border-zinc-200 rounded-xl shadow-2xl z-50 p-3 space-y-3">
-                            <select value={filterCountry} onChange={(e) => setFilterCountry(e.target.value)} className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800">
+                        <div className="absolute right-0 top-14 w-64 md:w-72 bg-zinc-100 border border-zinc-200 rounded-xl shadow-2xl z-50 p-3 space-y-3 max-h-[65vh] overflow-y-auto">
+                            <select value={filterCountry} onChange={(e) => setFilterCountry(e.target.value)} className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800 text-sm">
                                 <option value="All">All Countries</option>
                                 {filters.countries.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
-                            <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800">
+                            <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800 text-sm">
                                 <option value="All">All Types</option>
                                 {filters.types.map(t => <option key={t} value={t}>{t}</option>)}
                             </select>
-                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800">
+                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800 text-sm">
                                 <option value="id">Default Sort</option>
                                 <option value="amount_high">Amount: High to Low</option>
                                 <option value="amount_low">Amount: Low to High</option>

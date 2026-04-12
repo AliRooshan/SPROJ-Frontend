@@ -9,6 +9,7 @@ const Tracker = () => {
     const navigate = useNavigate();
     const [applications, setApplications] = useState([]);
     const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, appId: null, isPending: false });
+    const [activeMobileTab, setActiveMobileTab] = useState('pending');
 
     useEffect(() => {
         AuthService.getApplications().then(setApplications).catch(console.error);
@@ -97,15 +98,30 @@ const Tracker = () => {
                 title="Application Tracker"
                 subtitle={`Track your applications easily`}
                 icon={Target}
+                forceRow={true}
                 actions={
                     <button
                         onClick={() => navigate('/student/explore')}
-                        className="bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-lg md:rounded-xl px-4 py-2 text-sm md:px-6 md:py-2.5 md:text-base transition-all shadow-md hover:shadow-lg"
+                        className="bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-xl md:rounded-xl text-sm md:text-base transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 w-10 h-10 md:w-auto md:h-auto !p-0 md:!px-6 md:!py-2.5 shrink-0"
                     >
-                        Add Application
+                        <Plus size={20} className="md:hidden shrink-0" />
+                        <span className="hidden md:inline">Add Application</span>
                     </button>
                 }
             />
+
+            {/* Mobile Tabs */}
+            <div className="flex lg:hidden gap-2 bg-white/70 p-2 rounded-2xl border border-white/70 shadow-sm">
+                {statuses.map(status => (
+                    <button
+                        key={status}
+                        onClick={() => setActiveMobileTab(status)}
+                        className={`flex-1 text-center py-2.5 text-xs font-black uppercase tracking-wide rounded-xl transition-all ${activeMobileTab === status ? getStatusHeaderStyles(status) + ' shadow-sm' : 'bg-slate-50 border-2 border-transparent text-slate-500 hover:bg-slate-100'}`}
+                    >
+                        {statusLabels[status]} ({applications.filter(a => a.status === status).length})
+                    </button>
+                ))}
+            </div>
 
             {/* Kanban Board */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-5 items-start">
@@ -114,10 +130,10 @@ const Tracker = () => {
                     return (
                         <div
                             key={status}
-                            className="bg-white/70 backdrop-blur-xl border border-white/70 rounded-2xl md:rounded-3xl shadow-sm p-3 md:p-4 flex flex-col max-h-[72vh] md:max-h-[68vh]"
+                            className={`bg-white/70 backdrop-blur-xl border border-white/70 rounded-2xl md:rounded-3xl shadow-sm p-3 md:p-4 flex-col max-h-[72vh] md:max-h-[68vh] ${activeMobileTab === status ? 'flex' : 'hidden lg:flex'}`}
                         >
                             {/* Column Header */}
-                            <div className={`p-3 md:p-4 rounded-xl md:rounded-2xl ${getStatusHeaderStyles(status)} flex items-center justify-between mb-3 md:mb-4`}>
+                            <div className={`hidden lg:flex p-3 md:p-4 rounded-xl md:rounded-2xl ${getStatusHeaderStyles(status)} items-center justify-between mb-3 md:mb-4`}>
                                 <div className="flex items-center gap-2 md:gap-2.5 font-black uppercase tracking-wide text-xs md:text-sm text-slate-900">
                                     <div className={`p-1.5 rounded-lg ${getStatusAccentStyles(status)}`}>
                                         {getStatusIcon(status)}

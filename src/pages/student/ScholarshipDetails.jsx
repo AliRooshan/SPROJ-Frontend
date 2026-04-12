@@ -47,15 +47,16 @@ const ScholarshipDetails = () => {
             {/* Header */}
             <PageHeader
                 title={scholarship.name}
-                subtitle={`${scholarship.provider}`}
+                subtitle={`${scholarship.provider} · ${scholarship.country}`}
                 icon={Award}
+                forceRow={true}
                 actions={
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 px-4 py-2 bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-xl transition-all border border-white/50 backdrop-blur-md shadow-sm"
+                        className="flex items-center justify-center gap-2 w-10 h-10 md:w-auto md:h-auto !p-0 md:!px-4 md:!py-2 bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-xl transition-all border border-white/50 backdrop-blur-md shadow-sm shrink-0"
                     >
                         <ChevronLeft size={18} />
-                        Back
+                        <span className="hidden md:inline">Back</span>
                     </button>
                 }
             />
@@ -64,21 +65,21 @@ const ScholarshipDetails = () => {
             <div className="flex items-center gap-3">
                 <button
                     onClick={() => { window.open(scholarship.website || scholarship.url || '#', '_blank'); }}
-                    className="flex items-center gap-2 px-5 py-3 bg-transparent text-indigo-600 font-bold rounded-xl border-2 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all text-sm"
+                    className="flex items-center justify-center gap-2 w-11 h-11 md:w-auto md:h-auto !p-0 md:!px-5 md:!py-3 bg-transparent text-indigo-600 font-bold rounded-xl border-2 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all text-sm shrink-0"
                 >
                     <ExternalLink size={16} />
-                    Visit Website
+                    <span className="hidden md:inline">Visit Website</span>
                 </button>
                 <div className="flex-1" />
                 <button
                     onClick={handleSave}
-                    className={`flex items-center gap-2 px-5 py-3 font-bold rounded-xl transition-all text-sm border-2 shadow-sm ${isSaved
+                    className={`flex items-center justify-center gap-2 w-11 h-11 md:w-auto md:h-auto !p-0 md:!px-5 md:!py-3 font-bold rounded-xl transition-all text-sm border-2 shadow-sm shrink-0 ${isSaved
                         ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100 hover:border-red-300 shadow-red-50'
                         : 'bg-white border-indigo-200 text-indigo-600 hover:border-indigo-400 hover:bg-indigo-50 shadow-slate-100'
                         }`}
                 >
                     <Bookmark size={18} fill={isSaved ? "currentColor" : "none"} />
-                    {isSaved ? 'Unsave Scholarship' : 'Save Scholarship'}
+                    <span className="hidden md:inline">{isSaved ? 'Unsave Scholarship' : 'Save Scholarship'}</span>
                 </button>
             </div>
 
@@ -94,24 +95,20 @@ const ScholarshipDetails = () => {
                     </div>
 
                     {/* Compact stat chips */}
-                    <div className="flex items-stretch gap-2.5">
-                        <div className="flex flex-col px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Value</span>
-                            <span className="text-sm font-black text-slate-800">
+                    <div className="flex items-stretch gap-2 md:gap-2.5 w-full">
+                        <div className="flex flex-col px-2 md:px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Value</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 truncate">
                                 {scholarship.amount != null ? `${scholarship.currency || ''} ${scholarshipAmount.toLocaleString()}` : 'N/A'}
                             </span>
                         </div>
-                        <div className="flex flex-col px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Type</span>
-                            <span className="text-sm font-black text-slate-800">{scholarship.type || 'N/A'}</span>
+                        <div className="flex flex-col px-2 md:px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Type</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 truncate capitalize">{scholarship.type || 'N/A'}</span>
                         </div>
-                        <div className="flex flex-col px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Country</span>
-                            <span className="text-sm font-black text-slate-800">{scholarship.country || 'N/A'}</span>
-                        </div>
-                        <div className="flex flex-col px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Deadline</span>
-                            <span className="text-sm font-black text-slate-800">{formatDate(scholarship.deadline)}</span>
+                        <div className="flex flex-col px-2 md:px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Deadline</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 truncate">{formatDate(scholarship.deadline)}</span>
                         </div>
                     </div>
 

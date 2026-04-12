@@ -188,24 +188,24 @@ const ManageCosts = () => {
 
     return (
         <div className="space-y-4 md:space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight">Costs</h1>
-                    <p className="text-zinc-600 font-medium">Living costs by city and lifestyle.</p>
+            <div className="flex flex-row justify-between items-start md:items-center gap-4 group">
+                <div className="flex-1 min-w-0">
+                    <h1 className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight truncate">Costs</h1>
+                    <p className="text-zinc-600 font-medium text-xs md:text-sm mt-1 mb-0.5 truncate max-w-full">Living costs by city and lifestyle.</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                     <div className="relative">
                         <button
                             type="button"
                             onClick={() => setShowFilterDropdown((open) => !open)}
-                            className="px-4 py-3 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-700 font-bold hover:bg-zinc-200 flex items-center gap-2"
+                            className="flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-3 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-700 font-bold hover:bg-zinc-200 transition-all shrink-0"
                             aria-expanded={showFilterDropdown}
                             aria-haspopup="true"
                         >
                             <Filter size={18} />
                         </button>
                         {showFilterDropdown && (
-                            <div className="absolute right-0 top-14 w-64 bg-zinc-100 border border-zinc-200 rounded-xl shadow-2xl z-50 p-3 space-y-3">
+                            <div className="absolute right-0 top-14 w-64 bg-zinc-100 border border-zinc-200 rounded-xl shadow-2xl z-50 p-3 space-y-3 max-h-[65vh] overflow-y-auto">
                                 <div>
                                     <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Lifestyle</label>
                                     <select
@@ -251,10 +251,11 @@ const ManageCosts = () => {
                     <button
                         type="button"
                         onClick={openAddModal}
-                        className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/12 transition-all"
+                        className="flex items-center justify-center gap-2 w-10 h-10 md:w-auto md:h-auto !p-0 md:!px-5 md:!py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl shadow-lg shadow-amber-900/12 transition-all shrink-0"
                     >
-                        <Plus size={18} />
-                        Add new
+                        <Plus size={20} className="md:hidden shrink-0" />
+                        <Plus size={18} className="hidden md:inline shrink-0" />
+                        <span className="hidden md:inline">Add new</span>
                     </button>
                 </div>
             </div>

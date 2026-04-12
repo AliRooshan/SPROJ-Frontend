@@ -1,13 +1,13 @@
 import React from 'react';
 
-const PageHeader = ({ title, subtitle, icon: Icon, actions }) => {
+const PageHeader = ({ title, subtitle, icon: Icon, actions, forceRow = false }) => {
     return (
-        <div className="relative overflow-hidden bg-gradient-to-r from-indigo-500/90 via-purple-500/90 to-pink-500/90 backdrop-blur-3xl rounded-xl border border-white/40 shadow-xl shadow-purple-500/20 px-4 py-4 flex flex-col md:flex-row md:rounded-2xl md:px-8 md:py-6 items-start md:items-center justify-between gap-3 md:gap-4 group">
-            
+        <div className={`relative overflow-hidden bg-gradient-to-r from-indigo-500/90 via-purple-500/90 to-pink-500/90 backdrop-blur-3xl rounded-xl border border-white/40 shadow-xl shadow-purple-500/20 px-4 py-4 flex ${forceRow ? 'flex-row items-center' : 'flex-col md:flex-row items-start md:items-center'} md:rounded-2xl md:px-8 md:py-6 justify-between gap-3 md:gap-4 group`}>
+
             {/* Mirror/Glossy light reflections */}
             {/* Top highlight */}
             <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/5 to-transparent h-[45%] pointer-events-none"></div>
-            
+
             {/* Diagonal glass cut */}
             <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-white/20 via-transparent to-transparent pointer-events-none transform translate-x-1/3 -skew-x-12"></div>
 
@@ -33,7 +33,7 @@ const PageHeader = ({ title, subtitle, icon: Icon, actions }) => {
                 </div>
             </div>
             {actions && (
-                <div className="relative z-10 flex flex-wrap items-center gap-2 md:gap-3 shrink-0 w-full md:w-auto [&_button]:text-xs md:[&_button]:text-sm [&_button]:px-3 [&_button]:py-2 md:[&_button]:px-4 md:[&_button]:py-2.5">
+                <div className={`relative z-10 flex flex-wrap items-center gap-2 md:gap-3 shrink-0 ${forceRow ? 'w-auto' : 'w-full md:w-auto'} [&_button]:text-xs md:[&_button]:text-sm [&_button]:px-3 [&_button]:py-2 md:[&_button]:px-4 md:[&_button]:py-2.5`}>
                     {actions}
                 </div>
             )}

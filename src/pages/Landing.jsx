@@ -27,14 +27,14 @@ const Landing = () => {
                         Your all-in-one platform for discovering programs, managing applications, and planning your global education journey.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-                        <Link to="/login" state={{ isSignUp: true }} className="group relative w-full sm:w-auto text-center px-5 py-2.5 sm:px-7 sm:py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black rounded-full text-sm sm:text-base overflow-hidden transition-transform hover:scale-105 shadow-glow">
+                    <div className="flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+                        <Link to="/login" state={{ isSignUp: true }} className="group relative w-auto text-center px-5 py-2.5 sm:px-7 sm:py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black rounded-full text-sm sm:text-base overflow-hidden transition-transform hover:scale-105 shadow-glow">
                             <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <span className="relative flex items-center gap-2">
+                            <span className="relative flex items-center justify-center gap-2">
                                 Start Now <ArrowRight size={18} />
                             </span>
                         </Link>
-                        <Link to="/explore" className="w-full sm:w-auto text-center px-5 py-2.5 sm:px-7 sm:py-3.5 bg-white/80 border border-indigo-200 hover:bg-white hover:border-indigo-300 text-indigo-700 font-bold rounded-full text-sm sm:text-base backdrop-blur-md transition-all shadow-sm hover:shadow-md">
+                        <Link to="/explore" className="w-auto text-center px-5 py-2.5 sm:px-7 sm:py-3.5 bg-white/80 border border-indigo-200 hover:bg-white hover:border-indigo-300 text-indigo-700 font-bold rounded-full text-sm sm:text-base backdrop-blur-md transition-all shadow-sm hover:shadow-md">
                             Explore Programs
                         </Link>
                     </div>
@@ -58,7 +58,7 @@ const Landing = () => {
                             </div>
                             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20"></div>
                             <div className="relative z-10 flex flex-col h-full justify-between">
-                                <div>
+                                <div className="flex flex-col items-center text-center md:items-start md:text-left">
                                     <div className="w-11 h-11 rounded-2xl bg-white/90 flex items-center justify-center mb-5 text-indigo-600 border border-indigo-200 shadow-lg">
                                         <Compass size={22} />
                                     </div>
@@ -74,7 +74,7 @@ const Landing = () => {
                                 <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2070&auto=format&fit=crop" alt="University Campus" className="w-full h-full object-cover opacity-50 group-hover:opacity-60 transition-all duration-700" />
                             </div>
                             <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/60 to-transparent"></div>
-                            <div className="relative z-20 h-full flex flex-col justify-end">
+                            <div className="relative z-20 h-full flex flex-col justify-end items-center text-center md:items-start md:text-left">
                                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center mb-4 text-white shadow-xl group-hover:scale-110 transition-transform">
                                     <Globe size={28} strokeWidth={2.5} />
                                 </div>

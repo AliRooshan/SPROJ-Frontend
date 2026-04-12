@@ -39,13 +39,14 @@ const SavedPrograms = () => {
                 title="Saved Programs"
                 subtitle={`You have ${savedPrograms.length} programs saved to your collection.`}
                 icon={BookmarkCheck}
+                forceRow={true}
                 actions={
                     <button
                         onClick={() => navigate('/student/dashboard')}
-                        className="flex items-center gap-2 px-4 py-2 bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-xl transition-all border border-white/50 backdrop-blur-md shadow-sm"
+                        className="flex items-center justify-center gap-2 w-10 h-10 md:w-auto md:h-auto !p-0 md:!px-4 md:!py-2 bg-indigo-50/95 hover:bg-white text-indigo-900 font-bold rounded-xl transition-all border border-white/50 backdrop-blur-md shadow-sm"
                     >
-                        <ChevronLeft size={18} />
-                        Back to Dashboard
+                        <ChevronLeft size={18} className="shrink-0" />
+                        <span className="hidden md:inline">Back to Dashboard</span>
                     </button>
                 }
             />

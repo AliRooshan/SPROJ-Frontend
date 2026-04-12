@@ -103,18 +103,22 @@ const Profile = () => {
         <button
             onClick={handleSave}
             disabled={saveStatus === 'saving'}
-            className={`flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-5 md:py-2 rounded-lg md:rounded-xl font-bold text-xs md:text-sm transition-all shadow-md disabled:opacity-70 disabled:cursor-not-allowed
+            className={`flex items-center justify-center gap-1.5 md:gap-2 w-10 h-10 md:w-auto md:h-auto !p-0 md:!px-5 md:!py-2 rounded-lg md:rounded-xl font-bold text-xs md:text-sm transition-all shadow-md disabled:opacity-70 disabled:cursor-not-allowed shrink-0
                 ${saveStatus === 'success' ? 'bg-emerald-500 text-white' :
                   saveStatus === 'error'   ? 'bg-red-500 text-white' :
-                  'bg-white text-indigo-700 hover:bg-indigo-50'}`}
+                  'bg-white text-indigo-700 hover:bg-indigo-50 border border-white/50'}`}
         >
-            {saveStatus === 'saving'  ? <Loader2 size={16} className="animate-spin" /> :
-             saveStatus === 'success' ? <Check size={16} /> :
-             <Save size={16} />}
-            {saveStatus === 'saving'  ? 'Saving...' :
-             saveStatus === 'success' ? 'Saved!' :
-             saveStatus === 'error'   ? 'Error!' :
-             'Save Changes'}
+            <div className="flex shrink-0">
+                {saveStatus === 'saving'  ? <Loader2 size={18} className="animate-spin" /> :
+                 saveStatus === 'success' ? <Check size={18} /> :
+                 <Save size={18} />}
+            </div>
+            <span className="hidden md:inline">
+                {saveStatus === 'saving'  ? 'Saving...' :
+                 saveStatus === 'success' ? 'Saved!' :
+                 saveStatus === 'error'   ? 'Error!' :
+                 'Save Changes'}
+            </span>
         </button>
     );
 
@@ -131,24 +135,25 @@ const Profile = () => {
                 title="Edit Profile"
                 subtitle="Update your academic profile and study preferences"
                 icon={User}
+                forceRow={true}
                 actions={SaveButton}
             />
 
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col md:flex-row">
 
                 {/* ── Sidebar Tabs ── */}
-                <div className="w-full md:w-56 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-100 flex flex-row md:flex-col gap-0.5 md:gap-1 p-2.5 md:p-4 overflow-x-auto shrink-0">
+                <div className="w-full md:w-56 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-100 grid grid-cols-2 md:flex md:flex-col gap-1.5 md:gap-1 p-2.5 md:p-4 shrink-0">
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 md:gap-3 px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl text-left text-xs md:text-sm font-bold transition-all whitespace-nowrap
+                            className={`flex items-center justify-center md:justify-start gap-1.5 md:gap-3 px-2 py-2.5 md:px-4 md:py-2.5 rounded-lg md:rounded-xl text-left text-xs md:text-sm font-bold transition-all
                                 ${activeTab === tab.id
-                                    ? 'bg-indigo-600 text-white shadow-sm'
-                                    : 'text-slate-500 hover:bg-white hover:text-indigo-600'}`}
+                                    ? 'bg-indigo-600 text-white shadow-md'
+                                    : 'text-slate-500 bg-white md:bg-transparent border border-slate-100 md:border-transparent hover:bg-white hover:text-indigo-600 hover:border-slate-200'}`}
                         >
-                            <tab.icon size={16} />
-                            {tab.label}
+                            <tab.icon size={16} className="shrink-0" />
+                            <span className="truncate">{tab.label}</span>
                         </button>
                     ))}
                 </div>
