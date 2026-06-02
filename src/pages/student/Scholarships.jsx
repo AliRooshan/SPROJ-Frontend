@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import AuthService from '../../services/AuthService';
 import api from '../../services/api';
+import Pagination from '../../components/Pagination';
 
 
 const formatDate = (dateString) => {
@@ -32,6 +33,15 @@ const Scholarships = () => {
     const [filterOptions, setFilterOptions] = useState({ countries: [], types: [] });
     const [savedIds, setSavedIds] = useState(new Set());
     const user = AuthService.getCurrentUser();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const [loading, setLoading] = useState(true);
+
+    // Reset to page 1 when search or filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, selectedCountries, selectedTypes, sortBy]);
 
     const getScholarshipPrice = (scholarship) => {
         const val = Number(scholarship.standard_amount ?? scholarship.amount);
@@ -40,6 +50,7 @@ const Scholarships = () => {
     const toTitleCase = (value = '') =>
         String(value).charAt(0).toUpperCase() + String(value).slice(1).toLowerCase();
 
+    // 1. Fetch filters and saved scholarships on mount
     useEffect(() => {
         api.get('/scholarships/filters')
             .then(data => setFilterOptions({
@@ -48,16 +59,48 @@ const Scholarships = () => {
             }))
             .catch(err => console.error('Failed to load scholarship filters:', err));
 
-        api.get('/scholarships')
+        if (user) {
+            AuthService.getSavedScholarships()
+                .then(saved => {
+                    setSavedIds(new Set(saved.map(s => s.scholarship_id ?? s.id)));
+                })
+                .catch(() => {
+                    setSavedIds(new Set((user.savedScholarships ?? []).map(s => s.scholarship_id ?? s.id)));
+                });
+        }
+    }, []);
+
+    // 2. Fetch paginated data dynamically
+    useEffect(() => {
+        let active = true;
+        setLoading(true);
+
+        const queryParams = new URLSearchParams({
+            page: currentPage,
+            limit: 15,
+            search: searchTerm,
+            countries: selectedCountries.join(','),
+            types: selectedTypes.join(','),
+            sort_by: sortBy
+        });
+
+        api.get(`/scholarships?${queryParams.toString()}`)
             .then(data => {
-                setScholarships(data);
-                if (user) {
-                    const saved = new Set(data.filter(s => AuthService.isScholarshipSaved(s.id)).map(s => s.id));
-                    setSavedIds(saved);
+                if (active) {
+                    setScholarships(data.results || []);
+                    setTotalPages(data.totalPages || 1);
+                    setTotalCount(data.total || 0);
+                    setLoading(false);
                 }
             })
-            .catch(err => console.error('Failed to load scholarships:', err));
-    }, []);
+            .catch(() => {
+                if (active) setLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [currentPage, searchTerm, selectedCountries, selectedTypes, sortBy]);
 
     const handleToggleSave = async (e, scholarship) => {
         e.stopPropagation();
@@ -77,22 +120,6 @@ const Scholarships = () => {
     // Get unique types and countries for filter
     const types = ['All', ...filterOptions.types.map(t => toTitleCase(t))];
     const countries = ['All', ...filterOptions.countries];
-
-    const filtered = scholarships.filter(s => {
-        const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (s.provider && s.provider.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            (s.country || '').toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesType = selectedTypes.length === 0 ||
-            selectedTypes.some(t => t.toLowerCase() === String(s.type || '').toLowerCase());
-        const matchesCountry = selectedCountries.length === 0 || selectedCountries.includes(s.country);
-        return matchesSearch && matchesType && matchesCountry;
-    }).sort((a, b) => {
-        let amountA = getScholarshipPrice(a);
-        let amountB = getScholarshipPrice(b);
-        if (sortBy === 'amount_high') return amountB - amountA;
-        if (sortBy === 'amount_low') return amountA - amountB;
-        return a.id - b.id;
-    });
 
     const activeFilterCount = selectedCountries.length + selectedTypes.length;
 
@@ -250,8 +277,20 @@ const Scholarships = () => {
 
             {/* List */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
-                {filtered.length > 0 ? (
-                    filtered.map(item => {
+                {loading ? (
+                    // Show 6 elegant animated skeleton cards
+                    Array.from({ length: 6 }).map((_, idx) => (
+                        <div key={`skeleton-${idx}`} className="bg-white/40 rounded-[2rem] border border-slate-100 p-6 space-y-4 animate-pulse shadow-sm">
+                            <div className="h-4 bg-slate-200 rounded w-1/3" />
+                            <div className="h-6 bg-slate-200 rounded w-3/4" />
+                            <div className="space-y-2 pt-4">
+                                <div className="h-4 bg-slate-200 rounded w-5/6" />
+                                <div className="h-4 bg-slate-200 rounded w-1/2" />
+                            </div>
+                        </div>
+                    ))
+                ) : scholarships.length > 0 ? (
+                    scholarships.map(item => {
                         return (
                             <div key={item.id} className="bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 p-4 space-y-3 group flex flex-col">
                                 {/* Header: Provider & Save */}
@@ -320,6 +359,12 @@ const Scholarships = () => {
                     </div>
                 )}
             </div>
+
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
         </div>
     );
 };

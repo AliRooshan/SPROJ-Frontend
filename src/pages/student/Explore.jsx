@@ -4,6 +4,7 @@ import ProgramCard from '../../components/ProgramCard';
 import PageHeader from '../../components/PageHeader';
 import AuthService from '../../services/AuthService';
 import api from '../../services/api';
+import Pagination from '../../components/Pagination';
 
 const Explore = ({ isGuest = false }) => {
     const [programs, setPrograms] = useState([]);
@@ -13,36 +14,35 @@ const Explore = ({ isGuest = false }) => {
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [selectedDegrees, setSelectedDegrees] = useState([]);
     const [selectedDurations, setSelectedDurations] = useState([]);
-    const [budgetRange, setBudgetRange] = useState([0, 0]);
+    const [budgetRange, setBudgetRange] = useState([0, 50000]);
+    const [maxBudget, setMaxBudget] = useState(50000);
     const [showFilters, setShowFilters] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [sortBy, setSortBy] = useState('id');
     const [savedProgramIds, setSavedProgramIds] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
 
     const getProgramPrice = (program) => Number(
         program.standard_tuition ?? program.tuition ?? program.tuition_amount ?? 0
     );
 
+    // 1. Fetch initial filter constraints on mount
     useEffect(() => {
         api.get('/programs/filters')
-            .then(data => setFilterOptions({
-                countries: data.countries || [],
-                durations: data.durations || [],
-                degrees: data.degrees || []
-            }))
-            .catch(err => console.error('Failed to load filters:', err));
-
-        api.get('/programs')
             .then(data => {
-                setPrograms(data);
-                const maxTuition = Math.max(
-                    0,
-                    ...data.map(p => getProgramPrice(p)).filter(Number.isFinite)
-                );
-                setBudgetRange([0, maxTuition]);
-                setLoading(false);
+                setFilterOptions({
+                    countries: data.countries || [],
+                    durations: data.durations || [],
+                    degrees: data.degrees || []
+                });
+                if (data.maxTuition) {
+                    setMaxBudget(data.maxTuition);
+                    setBudgetRange([0, data.maxTuition]);
+                }
             })
-            .catch(() => setLoading(false));
+            .catch(err => console.error('Failed to load filters:', err));
 
         if (!isGuest) {
             AuthService.getSavedPrograms()
@@ -50,7 +50,6 @@ const Explore = ({ isGuest = false }) => {
                     setSavedProgramIds(saved.map(p => p.program_id ?? p.id));
                 })
                 .catch(() => {
-                    // fall back to cached session
                     const currentUser = AuthService.getCurrentUser();
                     if (currentUser) {
                         setSavedProgramIds((currentUser.savedPrograms ?? []).map(p => p.program_id ?? p.id));
@@ -58,6 +57,46 @@ const Explore = ({ isGuest = false }) => {
                 });
         }
     }, []);
+
+    // Reset page to 1 when filters change (except page itself)
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, selectedCountries, selectedDegrees, selectedDurations, budgetRange, sortBy]);
+
+    // 2. Fetch paginated data dynamically
+    useEffect(() => {
+        let active = true;
+        setLoading(true);
+
+        const queryParams = new URLSearchParams({
+            page: currentPage,
+            limit: 15,
+            search: searchTerm,
+            countries: selectedCountries.join(','),
+            degrees: selectedDegrees.join(','),
+            durations: selectedDurations.join(','),
+            tuition_min: budgetRange[0],
+            tuition_max: budgetRange[1],
+            sort_by: sortBy
+        });
+
+        api.get(`/programs?${queryParams.toString()}`)
+            .then(data => {
+                if (active) {
+                    setPrograms(data.results || []);
+                    setTotalPages(data.totalPages || 1);
+                    setTotalCount(data.total || 0);
+                    setLoading(false);
+                }
+            })
+            .catch(() => {
+                if (active) setLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [currentPage, searchTerm, selectedCountries, selectedDegrees, selectedDurations, budgetRange, sortBy]);
 
     const handleToggleSave = async (program) => {
         if (isGuest) return;
@@ -77,32 +116,13 @@ const Explore = ({ isGuest = false }) => {
     const degrees = ['All', ...filterOptions.degrees];
     const durations = ['All', ...filterOptions.durations];
 
-    const filteredPrograms = programs.filter(program => {
-        const matchesSearch = program.program?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            program.university?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCountry = selectedCountries.length === 0 || selectedCountries.includes(program.country);
-        const matchesDegree = selectedDegrees.length === 0 ||
-            selectedDegrees.some(d => (program.degree_level || '').toLowerCase() === d.toLowerCase());
-        const matchesDuration = selectedDurations.length === 0 || selectedDurations.includes(program.duration);
-        const matchesBudget = getProgramPrice(program) >= budgetRange[0] && getProgramPrice(program) <= budgetRange[1];
-        return matchesSearch && matchesCountry && matchesDegree && matchesDuration && matchesBudget;
-    }).sort((a, b) => {
-        if (sortBy === 'price_low') return getProgramPrice(a) - getProgramPrice(b);
-        if (sortBy === 'price_high') return getProgramPrice(b) - getProgramPrice(a);
-        return a.id - b.id;
-    });
-
-    const maxBudget = Math.max(
-        0,
-        ...programs.map(p => getProgramPrice(p)).filter(Number.isFinite)
-    );
     const activeFilterCount = selectedCountries.length + selectedDegrees.length + selectedDurations.length + (budgetRange[0] !== 0 || budgetRange[1] !== maxBudget ? 1 : 0);
 
     return (
         <div className="max-w-6xl mx-auto space-y-4 pb-6 md:space-y-6 md:pb-12 animate-in fade-in duration-500">
             <PageHeader
                 title="Explore Programs"
-                subtitle={`${filteredPrograms.length} programs across ${countries.length - 1} countries`}
+                subtitle="Discover and compare academic programs worldwide"
                 icon={Compass}
                 actions={
                     <div className="flex flex-row items-center w-full gap-2 md:gap-3 md:w-auto">
@@ -335,8 +355,20 @@ const Explore = ({ isGuest = false }) => {
 
             {/* Results */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
-                {filteredPrograms.length > 0 ? (
-                    filteredPrograms.map(program => (
+                {loading ? (
+                    // Show 6 elegant animated skeleton cards
+                    Array.from({ length: 6 }).map((_, idx) => (
+                        <div key={`skeleton-${idx}`} className="bg-white/40 rounded-[2rem] border border-slate-100 p-6 space-y-4 animate-pulse shadow-sm">
+                            <div className="h-4 bg-slate-200 rounded w-1/3" />
+                            <div className="h-6 bg-slate-200 rounded w-3/4" />
+                            <div className="space-y-2 pt-4">
+                                <div className="h-4 bg-slate-200 rounded w-5/6" />
+                                <div className="h-4 bg-slate-200 rounded w-1/2" />
+                            </div>
+                        </div>
+                    ))
+                ) : programs.length > 0 ? (
+                    programs.map(program => (
                         <ProgramCard
                             key={program.id}
                             program={program}
@@ -363,6 +395,12 @@ const Explore = ({ isGuest = false }) => {
                     </div>
                 )}
             </div>
+
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
         </div>
     );
 };
