@@ -249,20 +249,25 @@ const StudentDashboard = () => {
                         {/* Scrollable Content */}
                         <div className="space-y-3 relative z-10 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-red-200 scrollbar-track-transparent">
 
-                            {deadlines.length > 0 ? deadlines.map((item, idx) => (
-                                <div
-                                    key={idx}
-                                    onClick={() => navigate(`/student/program/${item.program_id}`)}
-                                    className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:border-red-200 shadow-sm hover:shadow-lg transition-all cursor-pointer group border-l-4 border-l-red-500 hover:-translate-y-1 md:gap-4 md:p-4 md:rounded-2xl"
-                                >
-                                    <div className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center bg-red-50 group-hover:bg-red-100 transition-colors flex-col">
-                                        <span className="text-[9px] font-bold text-red-500 uppercase leading-none">
-                                            {new Date(item.date).toLocaleDateString('en-US', { month: 'short' })}
-                                        </span>
-                                        <span className="text-sm font-black text-red-700 leading-none mt-0.5">
-                                            {new Date(item.date).toLocaleDateString('en-US', { day: '2-digit' })}
-                                        </span>
-                                    </div>
+                            {deadlines.length > 0 ? deadlines.map((item, idx) => {
+                                const d = new Date(item.date);
+                                const isValid = item.date && !isNaN(d.getTime());
+                                const monthStr = isValid ? d.toLocaleDateString('en-US', { month: 'short' }) : 'NA';
+                                const dayStr = isValid ? d.toLocaleDateString('en-US', { day: '2-digit' }) : 'NA';
+                                return (
+                                    <div
+                                        key={idx}
+                                        onClick={() => navigate(`/student/program/${item.program_id}`)}
+                                        className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:border-red-200 shadow-sm hover:shadow-lg transition-all cursor-pointer group border-l-4 border-l-red-500 hover:-translate-y-1 md:gap-4 md:p-4 md:rounded-2xl"
+                                    >
+                                        <div className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center bg-red-50 group-hover:bg-red-100 transition-colors flex-col">
+                                            <span className="text-[9px] font-bold text-red-500 uppercase leading-none">
+                                                {monthStr}
+                                            </span>
+                                            <span className="text-sm font-black text-red-700 leading-none mt-0.5">
+                                                {dayStr}
+                                            </span>
+                                        </div>
 
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-bold text-slate-800 text-sm line-clamp-1 group-hover:text-red-600 transition-colors mb-0.5">
@@ -273,7 +278,7 @@ const StudentDashboard = () => {
                                         </span>
                                     </div>
                                 </div>
-                            )) : (
+                            }) : (
                                 <div className="h-full flex flex-col items-center justify-center text-center p-6 py-12 bg-white/40 rounded-2xl border border-dashed border-red-100">
                                     <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mb-4">
                                         <CalendarCheck className="text-red-300" size={24} />
