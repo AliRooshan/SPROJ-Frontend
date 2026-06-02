@@ -12,7 +12,7 @@ const Explore = ({ isGuest = false }) => {
     const [filterOptions, setFilterOptions] = useState({ countries: [], durations: [], degrees: [] });
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [selectedDegrees, setSelectedDegrees] = useState([]);
-    const [selectedDuration, setSelectedDuration] = useState('All');
+    const [selectedDurations, setSelectedDurations] = useState([]);
     const [budgetRange, setBudgetRange] = useState([0, 0]);
     const [showFilters, setShowFilters] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
@@ -83,7 +83,7 @@ const Explore = ({ isGuest = false }) => {
         const matchesCountry = selectedCountries.length === 0 || selectedCountries.includes(program.country);
         const matchesDegree = selectedDegrees.length === 0 ||
             selectedDegrees.some(d => (program.degree_level || '').toLowerCase() === d.toLowerCase());
-        const matchesDuration = selectedDuration === 'All' || program.duration === selectedDuration;
+        const matchesDuration = selectedDurations.length === 0 || selectedDurations.includes(program.duration);
         const matchesBudget = getProgramPrice(program) >= budgetRange[0] && getProgramPrice(program) <= budgetRange[1];
         return matchesSearch && matchesCountry && matchesDegree && matchesDuration && matchesBudget;
     }).sort((a, b) => {
@@ -96,7 +96,7 @@ const Explore = ({ isGuest = false }) => {
         0,
         ...programs.map(p => getProgramPrice(p)).filter(Number.isFinite)
     );
-    const activeFilterCount = selectedCountries.length + selectedDegrees.length + (selectedDuration !== 'All' ? 1 : 0) + (budgetRange[0] !== 0 || budgetRange[1] !== maxBudget ? 1 : 0);
+    const activeFilterCount = selectedCountries.length + selectedDegrees.length + selectedDurations.length + (budgetRange[0] !== 0 || budgetRange[1] !== maxBudget ? 1 : 0);
 
     return (
         <div className="max-w-6xl mx-auto space-y-4 pb-6 md:space-y-6 md:pb-12 animate-in fade-in duration-500">
@@ -187,6 +187,17 @@ const Explore = ({ isGuest = false }) => {
 
                         {activeDropdown === 'degree' && (
                             <div className="absolute top-full left-0 mt-2 w-56 bg-white flex flex-col rounded-2xl shadow-xl shadow-slate-200 border border-slate-100 p-2 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                                {/* All option */}
+                                <label onClick={(e) => {
+                                    e.preventDefault();
+                                    setSelectedDegrees([]);
+                                }} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl cursor-pointer group transition-colors select-none">
+                                    <div className={`w-4 h-4 rounded-[4px] border flex items-center justify-center transition-colors shrink-0 ${selectedDegrees.length === 0 ? 'bg-purple-600 border-purple-600 text-white' : 'border-slate-300 group-hover:border-purple-400'}`}>
+                                        {selectedDegrees.length === 0 && <Check size={12} strokeWidth={3} />}
+                                    </div>
+                                    <span className="text-sm font-semibold text-slate-700 leading-none">All</span>
+                                </label>
+
                                 {degrees.filter(c => c !== 'All').map(d => (
                                     <label key={d} onClick={(e) => {
                                         e.preventDefault();
@@ -207,21 +218,36 @@ const Explore = ({ isGuest = false }) => {
                     <div className={`relative ${activeDropdown === 'duration' ? 'z-50' : 'z-40'}`}>
                         <button
                             onClick={() => setActiveDropdown(activeDropdown === 'duration' ? null : 'duration')}
-                            className={`flex items-center gap-2 px-4 h-[40px] rounded-full text-sm font-bold transition-all border outline-none ${selectedDuration !== 'All' || activeDropdown === 'duration' ? 'bg-purple-100 border-purple-200 text-purple-700 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}
+                            className={`flex items-center gap-2 px-4 h-[40px] rounded-full text-sm font-bold transition-all border outline-none ${selectedDurations.length > 0 || activeDropdown === 'duration' ? 'bg-purple-100 border-purple-200 text-purple-700 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}
                         >
                             <Clock size={14} />
-                            Duration {selectedDuration !== 'All' && <span className="w-1.5 h-1.5 rounded-full bg-purple-500 ml-0.5"></span>}
+                            Duration {selectedDurations.length > 0 && `(${selectedDurations.length})`}
                             <ChevronDown size={14} className={`transition-transform opacity-70 ml-0.5 ${activeDropdown === 'duration' ? 'rotate-180' : ''}`} />
                         </button>
 
                         {activeDropdown === 'duration' && (
-                            <div className="absolute top-full left-0 mt-2 w-48 bg-white flex flex-col rounded-2xl shadow-xl shadow-slate-200 border border-slate-100 p-2 animate-in fade-in zoom-in-95 duration-150">
-                                {durations.map(d => (
-                                    <label key={d} onClick={() => setSelectedDuration(d)} className="flex items-center justify-between px-3 py-2.5 hover:bg-slate-50 rounded-xl cursor-pointer group transition-colors select-none">
-                                        <span className={`text-sm font-semibold leading-none ${selectedDuration === d ? 'text-purple-700' : 'text-slate-700'}`}>{d === 'All' ? 'Any Duration' : d}</span>
-                                        <div className={`w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 ${selectedDuration === d ? 'border-purple-600' : 'border-slate-300 group-hover:border-purple-400'}`}>
-                                            {selectedDuration === d && <div className="w-2 h-2 rounded-full bg-purple-600" />}
+                            <div className="absolute top-full left-0 mt-2 w-56 bg-white flex flex-col rounded-2xl shadow-xl shadow-slate-200 border border-slate-100 p-2 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                                {/* All option */}
+                                <label onClick={(e) => {
+                                    e.preventDefault();
+                                    setSelectedDurations([]);
+                                }} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl cursor-pointer group transition-colors select-none">
+                                    <div className={`w-4 h-4 rounded-[4px] border flex items-center justify-center transition-colors shrink-0 ${selectedDurations.length === 0 ? 'bg-purple-600 border-purple-600 text-white' : 'border-slate-300 group-hover:border-purple-400'}`}>
+                                        {selectedDurations.length === 0 && <Check size={12} strokeWidth={3} />}
+                                    </div>
+                                    <span className="text-sm font-semibold text-slate-700 leading-none">All</span>
+                                </label>
+
+                                {durations.filter(c => c !== 'All').map(d => (
+                                    <label key={d} onClick={(e) => {
+                                        e.preventDefault();
+                                        if (selectedDurations.includes(d)) setSelectedDurations(selectedDurations.filter(x => x !== d));
+                                        else setSelectedDurations([...selectedDurations, d]);
+                                    }} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl cursor-pointer group transition-colors select-none">
+                                        <div className={`w-4 h-4 rounded-[4px] border flex items-center justify-center transition-colors shrink-0 ${selectedDurations.includes(d) ? 'bg-purple-600 border-purple-600 text-white' : 'border-slate-300 group-hover:border-purple-400'}`}>
+                                            {selectedDurations.includes(d) && <Check size={12} strokeWidth={3} />}
                                         </div>
+                                        <span className="text-sm font-semibold text-slate-700 leading-none">{d}</span>
                                     </label>
                                 ))}
                             </div>
@@ -292,7 +318,7 @@ const Explore = ({ isGuest = false }) => {
                             onClick={() => {
                                 setSelectedCountries([]);
                                 setSelectedDegrees([]);
-                                setSelectedDuration('All');
+                                setSelectedDurations([]);
                                 setBudgetRange([0, maxBudget]);
                                 setSortBy('id');
                                 setActiveDropdown(null);

@@ -178,19 +178,19 @@ const ProgramDetails = () => {
                     </div>
 
                     {/* Compact stat chips — above description */}
-                    <div className="flex items-stretch gap-2 md:gap-2.5 w-full">
-                        <div className="flex flex-col px-2.5 py-2 md:px-3.5 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
-                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Duration</span>
-                            <span className="text-xs md:text-sm font-black text-slate-800 truncate">{program.duration || 'N/A'}</span>
+                    <div className="flex flex-wrap md:flex-nowrap items-stretch gap-2 md:gap-2.5 w-full">
+                        <div className="flex flex-col px-2.5 py-2 md:px-3.5 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5">Duration</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 break-words leading-tight">{program.duration || 'N/A'}</span>
                         </div>
-                        <div className="flex flex-col px-2.5 py-2 md:px-3.5 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
-                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Intake</span>
-                            <span className="text-xs md:text-sm font-black text-slate-800 truncate">{formatDate(program.deadline)}</span>
+                        <div className="flex flex-col px-2.5 py-2 md:px-3.5 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5">Intake</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 break-words leading-tight">{formatDate(program.deadline)}</span>
                         </div>
-                        <div className="flex flex-col px-2.5 py-2 md:px-3.5 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
-                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Tuition</span>
-                            <span className="text-xs md:text-sm font-black text-slate-800 truncate">
-                                {program.tuition != null ? `$${Number(program.tuition).toLocaleString()}` : 'N/A'}
+                        <div className="flex flex-col px-2.5 py-2 md:px-3.5 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5">Tuition</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 break-words leading-tight">
+                                {program.tuition != null ? `${program.currency || 'USD'} ${Number(program.tuition).toLocaleString()}` : 'N/A'}
                             </span>
                         </div>
                     </div>
