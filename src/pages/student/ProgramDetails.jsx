@@ -193,6 +193,15 @@ const ProgramDetails = () => {
                                 {program.tuition != null ? `${program.currency || 'USD'} ${Number(program.tuition).toLocaleString()}` : 'N/A'}
                             </span>
                         </div>
+                        {program.match_score != null && (
+                            <div className="flex flex-col px-2.5 py-2 md:px-3.5 bg-emerald-50 border border-emerald-100 rounded-lg flex-1 min-w-0 text-emerald-800">
+                                <span className="text-[10px] md:text-xs font-bold text-emerald-600 uppercase tracking-wide md:tracking-widest mb-0.5 flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Match
+                                </span>
+                                <span className="text-xs md:text-sm font-black break-words leading-tight">{Math.round(program.match_score)}% Match</span>
+                            </div>
+                        )}
                     </div>
 
                     <p className="text-slate-600 text-medium leading-relaxed">

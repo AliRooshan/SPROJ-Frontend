@@ -310,7 +310,12 @@ const Explore = ({ isGuest = false }) => {
                             className={`flex items-center gap-2 px-4 h-[40px] rounded-full text-sm font-bold transition-all border outline-none ${sortBy !== 'id' || activeDropdown === 'sort' ? 'bg-purple-100 border-purple-200 text-purple-700 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}
                         >
                             <ArrowUpDown size={14} />
-                            Sort: {sortBy === 'match' ? 'Best Match' : sortBy === 'price_low' ? 'Low to High' : sortBy === 'price_high' ? 'High to Low' : 'Default'}
+                            Sort: {
+                                sortBy === 'match_high' ? 'Match: High to Low' :
+                                sortBy === 'match_low' ? 'Match: Low to High' :
+                                sortBy === 'price_low' ? 'Price: Low to High' :
+                                sortBy === 'price_high' ? 'Price: High to Low' : 'Default'
+                            }
                             <ChevronDown size={14} className={`transition-transform opacity-70 ml-0.5 ${activeDropdown === 'sort' ? 'rotate-180' : ''}`} />
                         </button>
 
@@ -318,6 +323,10 @@ const Explore = ({ isGuest = false }) => {
                             <div className="absolute top-full left-0 mt-2 w-56 bg-white flex flex-col rounded-2xl shadow-xl shadow-slate-200 border border-slate-100 p-2 animate-in fade-in zoom-in-95 duration-150">
                                 {[
                                     { id: 'id', label: 'Default' },
+                                    ...(!isGuest ? [
+                                        { id: 'match_high', label: 'Match: High to Low' },
+                                        { id: 'match_low', label: 'Match: Low to High' }
+                                    ] : []),
                                     { id: 'price_low', label: 'Price: Low to High' },
                                     { id: 'price_high', label: 'Price: High to Low' }
                                 ].map(option => (

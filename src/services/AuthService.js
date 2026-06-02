@@ -22,11 +22,14 @@ const parseBudgetRange = (budget) => {
 
 const formatBudgetRange = (min, max) => {
   if (min == null && max == null) return '';
-  if (min === 0 && max === 10000) return '<10k';
-  if (min === 10000 && max === 20000) return '10k-20k';
-  if (min === 20000 && max === 40000) return '20k-40k';
-  if (min === 40000 && max == null) return '40k+';
-  if (min != null && max != null) return `${min}-${max}`;
+  const numMin = min != null ? Number(min) : null;
+  const numMax = max != null ? Number(max) : null;
+
+  if (numMin === 0 && numMax === 10000) return '<10k';
+  if (numMin === 10000 && numMax === 20000) return '10k-20k';
+  if (numMin === 20000 && numMax === 40000) return '20k-40k';
+  if (numMin === 40000 && numMax == null) return '40k+';
+  if (numMin != null && numMax != null) return `${numMin}-${numMax}`;
   return '';
 };
 
@@ -141,9 +144,10 @@ const updateProfile = async (formData) => {
   const response = await api.put(`/users/${user.id}/profile`, payload);
   // Backend returns { message, user: {...} } — extract the user object
   const updatedUser = response.user ?? response;
-  // Merge with existing session so fields the backend doesn't echo back (like id) are preserved
-  updateSession({ ...user, ...updatedUser, id: user.id });
-  return updatedUser;
+  // Merge with existing session and normalize to camelCase
+  const normalised = normaliseUser({ ...user, ...updatedUser, id: user.id });
+  updateSession(normalised);
+  return normalised;
 };
 
 const updateAccountBasics = async ({ fullName, phone }) => {
@@ -154,8 +158,10 @@ const updateAccountBasics = async ({ fullName, phone }) => {
     phone: phone ?? null
   });
   const updatedUser = response.user ?? response;
-  updateSession({ ...user, ...updatedUser, id: user.id });
-  return updatedUser;
+  // Merge with existing session and normalize to camelCase
+  const normalised = normaliseUser({ ...user, ...updatedUser, id: user.id });
+  updateSession(normalised);
+  return normalised;
 };
 
 // ── Saved Programs ─────────────────────────────────────────────────────────────

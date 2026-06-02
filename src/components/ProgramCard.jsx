@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const ProgramCard = ({ program, isGuest = false, isSaved = false, onToggleSave }) => {
     const programName = program.program ?? program.name ?? 'Program';
     const tuitionValue = Number(program.tuition ?? program.tuition_amount ?? 0);
+    const matchScore = program.match_score ? Number(program.match_score) : null;
 
     const navigate = useNavigate();
 
@@ -25,14 +26,23 @@ const ProgramCard = ({ program, isGuest = false, isSaved = false, onToggleSave }
                     {program.university}
                 </div>
 
-                {!isGuest && (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onToggleSave && onToggleSave(program); }}
-                        className={`p-2 rounded-xl transition-all ${isSaved ? 'bg-indigo-50 text-indigo-600' : 'text-slate-400 hover:bg-slate-50 hover:text-indigo-600'}`}
-                    >
-                        <Bookmark size={18} fill={isSaved ? "currentColor" : "none"} />
-                    </button>
-                )}
+                <div className="flex items-center gap-2">
+                    {matchScore !== null && (
+                        <div className="flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            {Math.round(matchScore)}% Match
+                        </div>
+                    )}
+
+                    {!isGuest && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onToggleSave && onToggleSave(program); }}
+                            className={`p-2 rounded-xl transition-all ${isSaved ? 'bg-indigo-50 text-indigo-600' : 'text-slate-400 hover:bg-slate-50 hover:text-indigo-600'}`}
+                        >
+                            <Bookmark size={18} fill={isSaved ? "currentColor" : "none"} />
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Title */}

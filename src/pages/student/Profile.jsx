@@ -89,7 +89,21 @@ const Profile = () => {
     const handleSave = async () => {
         setSaveStatus('saving');
         try {
-            await AuthService.updateProfile(formData);
+            const updated = await AuthService.updateProfile(formData);
+            setFormData({
+                fullName:        updated.fullName        || '',
+                email:           updated.email           || '',
+                phone:           updated.phone           || '',
+                degree:          updated.degree          || 'Bachelors',
+                major:           updated.major           || '',
+                gpa:             updated.gpa             || '',
+                englishTest:     updated.englishTest      || 'IELTS',
+                englishScore:    updated.englishScore     || '',
+                targetCountries: updated.targetCountries  || [],
+                intake:          updated.intake          || 'Fall 2025',
+                budget:          updated.budget          || '',
+                careerGoal:      updated.careerGoal      || '',
+            });
             setSaveStatus('success');
             setTimeout(() => setSaveStatus(''), 3000);
         } catch (err) {

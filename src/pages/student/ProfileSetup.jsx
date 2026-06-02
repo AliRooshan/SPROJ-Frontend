@@ -14,7 +14,7 @@ const steps = [
 const ProfileSetup = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(1);
-    const [showPhoneError, setShowPhoneError] = useState(false);
+    const [validationErrors, setValidationErrors] = useState({});
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -37,12 +37,31 @@ const ProfileSetup = () => {
     useEffect(() => {
         const currentUser = AuthService.getCurrentUser();
         if (currentUser) {
-            setFormData(prev => ({
-                ...prev,
-                ...currentUser,
-                // Ensure array is initialized
-                targetCountries: currentUser.targetCountries || []
-            }));
+            setFormData(prev => {
+                const updated = { ...prev };
+                if (currentUser.fullName) updated.fullName = currentUser.fullName;
+                if (currentUser.email) updated.email = currentUser.email;
+                if (currentUser.phone) updated.phone = currentUser.phone;
+                if (currentUser.degree) updated.degree = currentUser.degree;
+                if (currentUser.major) updated.major = currentUser.major;
+                if (currentUser.gpa) updated.gpa = currentUser.gpa;
+                if (currentUser.englishTest) updated.englishTest = currentUser.englishTest;
+                if (currentUser.englishScore) updated.englishScore = currentUser.englishScore;
+                if (currentUser.targetCountries && currentUser.targetCountries.length > 0) {
+                    updated.targetCountries = currentUser.targetCountries;
+                }
+                if (currentUser.intake) {
+                    updated.intake = currentUser.intake;
+                    const parts = currentUser.intake.split(' ');
+                    if (parts.length === 2) {
+                        updated.intakeSeason = parts[0];
+                        updated.intakeYear = parts[1];
+                    }
+                }
+                if (currentUser.budget) updated.budget = currentUser.budget;
+                if (currentUser.careerGoal) updated.careerGoal = currentUser.careerGoal;
+                return updated;
+            });
         } else {
             // No user logged in, redirect to login
             navigate('/login/student');
@@ -57,8 +76,20 @@ const ProfileSetup = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        if (name === 'phone' && value) setShowPhoneError(false);
+        setFormData(prev => {
+            const nextData = { ...prev, [name]: value };
+            if (name === 'englishTest' && value === 'None') {
+                nextData.englishScore = '';
+            }
+            return nextData;
+        });
+        
+        if (validationErrors[name]) {
+            setValidationErrors(prev => ({ ...prev, [name]: false }));
+        }
+        if (name === 'englishTest' && value === 'None' && validationErrors.englishScore) {
+            setValidationErrors(prev => ({ ...prev, englishScore: false }));
+        }
     };
 
     const handleCountryToggle = (country) => {
@@ -70,9 +101,44 @@ const ProfileSetup = () => {
         });
     };
 
+    const validateStep = (step) => {
+        const errors = {};
+        if (step === 1) {
+            if (!formData.fullName || !formData.fullName.trim()) {
+                errors.fullName = true;
+            }
+            if (!formData.phone || !formData.phone.trim()) {
+                errors.phone = true;
+            }
+        } else if (step === 2) {
+            if (!formData.major || !formData.major.trim()) {
+                errors.major = true;
+            }
+            if (!formData.gpa || !formData.gpa.trim()) {
+                errors.gpa = true;
+            }
+            if (formData.englishTest !== 'None' && (!formData.englishScore || !formData.englishScore.trim())) {
+                errors.englishScore = true;
+            }
+        } else if (step === 3) {
+            if (!formData.targetCountries || formData.targetCountries.length === 0 || !formData.targetCountries[0]) {
+                errors.targetCountries = true;
+            }
+        } else if (step === 4) {
+            if (!formData.budget) {
+                errors.budget = true;
+            }
+            if (!formData.careerGoal || !formData.careerGoal.trim()) {
+                errors.careerGoal = true;
+            }
+        }
+        setValidationErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const handleNext = async () => {
-        if (currentStep === 1 && !formData.phone) {
-            setShowPhoneError(true);
+        const isValid = validateStep(currentStep);
+        if (!isValid) {
             return;
         }
 
@@ -96,16 +162,6 @@ const ProfileSetup = () => {
         }
     };
 
-    const handleSkip = async () => {
-        if (currentStep < 4) {
-            setCurrentStep(prev => prev + 1);
-            window.scrollTo(0, 0);
-        } else {
-            await AuthService.updateProfile(formData);
-            navigate('/student/dashboard');
-        }
-    };
-
     const renderStepContent = () => {
         switch (currentStep) {
             case 1:
@@ -113,13 +169,16 @@ const ProfileSetup = () => {
                     <div className="space-y-3 md:space-y-4">
                         <div className="grid grid-cols-2 gap-3 md:gap-4">
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Full Name</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Full Name <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     name="fullName"
                                     value={formData.fullName}
                                     onChange={handleChange}
-                                    className="block w-full px-4 py-2 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900 placeholder-slate-400 transition-all font-medium text-sm"
+                                    className={`block w-full px-4 py-2 border-2 rounded-xl transition-all font-medium text-sm ${validationErrors.fullName
+                                        ? 'bg-red-50 border-red-200 focus:ring-red-100 focus:border-red-400'
+                                        : 'bg-white border-indigo-50 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900'
+                                        }`}
                                     placeholder="John Doe"
                                 />
                             </div>
@@ -130,7 +189,7 @@ const ProfileSetup = () => {
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleChange}
-                                    className={`block w-full px-4 py-2 border-2 rounded-xl transition-all font-medium text-sm ${showPhoneError
+                                    className={`block w-full px-4 py-2 border-2 rounded-xl transition-all font-medium text-sm ${validationErrors.phone
                                         ? 'bg-red-50 border-red-200 focus:ring-red-100 focus:border-red-400'
                                         : 'bg-white border-indigo-50 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900'
                                         }`}
@@ -167,24 +226,30 @@ const ProfileSetup = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3 md:gap-4">
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Field of Study</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Field of Study <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     name="major"
                                     value={formData.major}
                                     onChange={handleChange}
-                                    className="block w-full px-4 py-2 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900 placeholder-slate-400 transition-all font-medium text-sm"
+                                    className={`block w-full px-4 py-2 border-2 rounded-xl transition-all font-medium text-sm ${validationErrors.major
+                                        ? 'bg-red-50 border-red-200 focus:ring-red-100 focus:border-red-400'
+                                        : 'bg-white border-indigo-50 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900'
+                                        }`}
                                     placeholder="Computer Science"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">GPA</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">GPA <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     name="gpa"
                                     value={formData.gpa}
                                     onChange={handleChange}
-                                    className="block w-full px-4 py-2 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900 placeholder-slate-400 transition-all font-medium text-sm"
+                                    className={`block w-full px-4 py-2 border-2 rounded-xl transition-all font-medium text-sm ${validationErrors.gpa
+                                        ? 'bg-red-50 border-red-200 focus:ring-red-100 focus:border-red-400'
+                                        : 'bg-white border-indigo-50 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900'
+                                        }`}
                                     placeholder="3.8 / 4.0"
                                 />
                             </div>
@@ -206,7 +271,7 @@ const ProfileSetup = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Score</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Score {formData.englishTest !== 'None' && <span className="text-red-500">*</span>}</label>
                                 <input
                                     type="text"
                                     name="englishScore"
@@ -215,7 +280,9 @@ const ProfileSetup = () => {
                                     disabled={formData.englishTest === 'None'}
                                     className={`block w-full px-4 py-2 border-2 rounded-xl transition-all font-medium text-sm ${formData.englishTest === 'None'
                                         ? 'bg-slate-50 border-slate-100 text-slate-400 cursor-not-allowed'
-                                        : 'bg-white border-indigo-50 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900'
+                                        : validationErrors.englishScore
+                                            ? 'bg-red-50 border-red-200 focus:ring-red-100 focus:border-red-400'
+                                            : 'bg-white border-indigo-50 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900'
                                         }`}
                                     placeholder={formData.englishTest === 'IELTS' ? 'e.g. 7.5' : 'Score'}
                                 />
@@ -227,12 +294,21 @@ const ProfileSetup = () => {
                 return (
                     <div className="space-y-4 md:space-y-6">
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Target Country</label>
+                            <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Target Country <span className="text-red-500">*</span></label>
                             <select
                                 name="targetCountries"
                                 value={formData.targetCountries[0] || ''}
-                                onChange={(e) => setFormData(prev => ({ ...prev, targetCountries: [e.target.value] }))}
-                                className="block w-full px-4 py-2 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900 transition-all font-medium cursor-pointer text-sm"
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setFormData(prev => ({ ...prev, targetCountries: val ? [val] : [] }));
+                                    if (validationErrors.targetCountries) {
+                                        setValidationErrors(prev => ({ ...prev, targetCountries: false }));
+                                    }
+                                }}
+                                className={`block w-full px-4 py-2 border-2 rounded-xl transition-all font-medium text-sm cursor-pointer ${validationErrors.targetCountries
+                                    ? 'bg-red-50 border-red-200 focus:ring-red-100 focus:border-red-400'
+                                    : 'bg-white border-indigo-50 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900'
+                                    }`}
                             >
                                 <option value="">Select target country</option>
                                 {availableCountries.map(country => (
@@ -287,12 +363,15 @@ const ProfileSetup = () => {
                 return (
                     <div className="space-y-4 md:space-y-6">
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Estimated Annual Budget</label>
+                            <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Estimated Annual Budget <span className="text-red-500">*</span></label>
                             <select
                                 name="budget"
                                 value={formData.budget}
                                 onChange={handleChange}
-                                className="block w-full px-4 py-2 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900 transition-all font-medium cursor-pointer text-sm"
+                                className={`block w-full px-4 py-2 border-2 rounded-xl transition-all font-medium text-sm cursor-pointer ${validationErrors.budget
+                                    ? 'bg-red-50 border-red-200 focus:ring-red-100 focus:border-red-400'
+                                    : 'bg-white border-indigo-50 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900'
+                                    }`}
                             >
                                 <option value="">Select budget range</option>
                                 <option value="<10k">Less than $10,000</option>
@@ -302,13 +381,16 @@ const ProfileSetup = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Career Goal</label>
+                            <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Career Goal <span className="text-red-500">*</span></label>
                             <textarea
                                 name="careerGoal"
                                 value={formData.careerGoal}
                                 onChange={handleChange}
                                 rows={2}
-                                className="block w-full px-4 py-2 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900 placeholder-slate-400 transition-all resize-none font-medium text-sm"
+                                className={`block w-full px-4 py-2 border-2 rounded-xl transition-all resize-none font-medium text-sm ${validationErrors.careerGoal
+                                    ? 'bg-red-50 border-red-200 focus:ring-red-100 focus:border-red-400'
+                                    : 'bg-white border-indigo-50 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-slate-900'
+                                    }`}
                                 placeholder="I want to specialize in AI..."
                             />
                         </div>
@@ -376,16 +458,7 @@ const ProfileSetup = () => {
 
                     {/* Footer */}
                     <div className="bg-white/50 px-4 py-2.5 md:px-6 md:py-3 border-t border-indigo-50 flex justify-between items-center gap-2 backdrop-blur-md">
-                        {currentStep > 1 ? (
-                            <button
-                                onClick={handleSkip}
-                                className="text-slate-500 hover:text-indigo-600 font-bold px-2 md:px-4 transition-colors text-xs md:text-sm shrink-0"
-                            >
-                                Skip
-                            </button>
-                        ) : (
-                            <div></div>
-                        )}
+                        <div></div>
                         <div className="flex gap-2 md:gap-3 shrink-0">
                             {currentStep > 1 && (
                                 <button
