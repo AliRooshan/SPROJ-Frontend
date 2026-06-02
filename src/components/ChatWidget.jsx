@@ -1,5 +1,89 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
+import api from '../services/api';
+import AuthService from '../services/AuthService';
+
+const parseMarkdown = (text) => {
+    if (!text) return '';
+    
+    const lines = text.split('\n');
+    
+    return lines.map((line, index) => {
+        const isBullet = /^\s*[\-\*]\s+(.*)/.exec(line);
+        const isNumbered = /^\s*(\d+)\.\s+(.*)/.exec(line);
+        const isHeader3 = /^\s*###\s+(.*)/.exec(line);
+        const isHeader2 = /^\s*##\s+(.*)/.exec(line);
+        const isHeader1 = /^\s*#\s+(.*)/.exec(line);
+        
+        let content = line;
+        let isListItem = false;
+        let listStyle = '';
+        let isHeader = false;
+        let headerLevel = 0;
+        
+        if (isBullet) {
+            content = isBullet[1];
+            isListItem = true;
+            listStyle = 'bullet';
+        } else if (isNumbered) {
+            content = isNumbered[2];
+            isListItem = true;
+            listStyle = 'numbered';
+        } else if (isHeader3) {
+            content = isHeader3[1];
+            isHeader = true;
+            headerLevel = 3;
+        } else if (isHeader2) {
+            content = isHeader2[1];
+            isHeader = true;
+            headerLevel = 2;
+        } else if (isHeader1) {
+            content = isHeader1[1];
+            isHeader = true;
+            headerLevel = 1;
+        }
+        
+        const boldParts = content.split('**');
+        const renderedContent = boldParts.map((part, idx) => {
+            if (idx % 2 === 1) {
+                return <strong key={idx} className="font-extrabold text-slate-900">{part}</strong>;
+            }
+            return part;
+        });
+        
+        if (isListItem) {
+            if (listStyle === 'bullet') {
+                return (
+                    <li key={index} className="ml-5 list-disc my-1 text-slate-700 leading-relaxed pl-1">
+                        {renderedContent}
+                    </li>
+                );
+            } else {
+                return (
+                    <li key={index} className="ml-5 list-decimal my-1 text-slate-700 leading-relaxed pl-1" style={{ listStyleType: 'decimal' }}>
+                        {renderedContent}
+                    </li>
+                );
+            }
+        }
+        
+        if (isHeader) {
+            if (headerLevel === 3) {
+                return <h4 key={index} className="text-xs font-black text-slate-900 mt-2.5 mb-1">{renderedContent}</h4>;
+            } else if (headerLevel === 2) {
+                return <h3 key={index} className="text-sm font-black text-slate-900 mt-3.5 mb-1.5">{renderedContent}</h3>;
+            } else {
+                return <h2 key={index} className="text-base font-black text-slate-900 mt-4 mb-2">{renderedContent}</h2>;
+            }
+        }
+        
+        return (
+            <p key={index} className="my-1 min-h-[1rem] text-slate-700 leading-relaxed">
+                {renderedContent}
+            </p>
+        );
+    });
+};
 
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -7,29 +91,53 @@ const ChatWidget = () => {
         { type: 'bot', text: 'Hi! I am the EdVoyage AI Assistant. How can I help you today?' }
     ]);
     const [input, setInput] = useState('');
+    const [isTyping, setIsTyping] = useState(false);
+    
+    const messagesEndRef = useRef(null);
+    const user = AuthService.getCurrentUser();
 
     const toggleChat = () => setIsOpen(!isOpen);
 
-    const handleSend = (e) => {
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages, isTyping]);
+
+    const handleSend = async (e) => {
         e.preventDefault();
         if (!input.trim()) return;
 
         const userMessage = input;
-        setMessages([...messages, { type: 'user', text: userMessage }]);
+        setMessages(prev => [...prev, { type: 'user', text: userMessage }]);
         setInput('');
+        setIsTyping(true);
 
-        // Mock bot response
-        setTimeout(() => {
-            let botResponse = "I'm a prototype AI. I can't answer that yet, but I'm learning!";
+        try {
+            const data = await api.post('/chat', {
+                message: userMessage,
+                userId: user?.id || 'guest',
+                email: user?.email || 'guest@edvoyage.com',
+                name: user?.fullName || 'Guest User',
+                gpa: user?.gpa || null,
+                major: user?.major || null,
+                degree: user?.degree || null,
+                budget: user?.budget || null,
+                targetCountries: user?.targetCountries || null
+            });
 
-            if (userMessage.toLowerCase().includes('apply')) {
-                botResponse = "To apply, navigate to the 'Explore' page, select a program you like, and click the 'Apply Now' button. Make sure your profile is 100% complete first!";
-            } else if (userMessage.toLowerCase().includes('scholarship')) {
-                botResponse = "We have many scholarships available! Check the 'Scholarships' tab in your dashboard to match with ones that fit your profile.";
-            }
-
+            // Extract response text robustly from n8n JSON output
+            const botResponse = data.output || data.response || data.text || data.message || (Array.isArray(data) ? (data[0]?.output || data[0]?.response || data[0]?.text) : null) || JSON.stringify(data) || "I'm sorry, I couldn't process your request.";
+            
             setMessages(prev => [...prev, { type: 'bot', text: botResponse }]);
-        }, 1000);
+        } catch (err) {
+            console.error('Chat error:', err);
+            setMessages(prev => [...prev, { type: 'bot', text: 'Sorry, I am having trouble connecting to my brain right now. Please try again later.' }]);
+        } finally {
+            setIsTyping(false);
+        }
     };
 
     return (
@@ -62,31 +170,24 @@ const ChatWidget = () => {
                                     ? 'bg-primary text-white rounded-br-sm'
                                     : 'bg-white border border-slate-200 text-slate-700 rounded-bl-sm'
                                     }`}>
-                                    {msg.text}
+                                    {msg.type === 'user' ? msg.text : parseMarkdown(msg.text)}
                                 </div>
                             </div>
                         ))}
+                        {isTyping && (
+                            <div className="flex justify-start animate-in fade-in duration-300">
+                                <div className="bg-white border border-slate-200 text-slate-500 rounded-xl sm:rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                                </div>
+                            </div>
+                        )}
+                        <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Suggested Questions & Input */}
-                    <div className="bg-white border-t border-slate-100 p-3 sm:p-4 shrink-0 space-y-2 sm:space-y-3">
-                        {/* Suggested Pills */}
-                        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                            {[
-                                { label: "How do I apply?", val: "How do I apply?" },
-                                { label: "Scholarships", val: "scholarship info" },
-                                { label: "Deadlines", val: "application deadlines" }
-                            ].map((item, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setInput(item.val)}
-                                    className="text-[10px] sm:text-xs bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full transition-colors whitespace-nowrap"
-                                >
-                                    {item.label}
-                                </button>
-                            ))}
-                        </div>
-
+                    {/* Input Area */}
+                    <div className="bg-white border-t border-slate-100 p-3 sm:p-4 shrink-0">
                         <form onSubmit={handleSend} className="flex gap-2 items-center">
                             <input
                                 type="text"
