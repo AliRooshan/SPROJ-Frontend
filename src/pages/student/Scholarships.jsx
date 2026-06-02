@@ -7,8 +7,17 @@ import api from '../../services/api';
 
 
 const formatDate = (dateString) => {
-    if (!dateString) return 'TBA';
-    return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return dateString || 'TBA';
+};
+
+const formatScholarshipAmount = (amount, currency) => {
+    if (amount === null || amount === undefined || amount === '') return 'N/A';
+    const parsed = Number(amount);
+    if (!isNaN(parsed)) {
+        const formatted = parsed.toLocaleString();
+        return currency ? `${currency} ${formatted}` : formatted;
+    }
+    return amount;
 };
 
 const Scholarships = () => {
@@ -24,9 +33,10 @@ const Scholarships = () => {
     const [savedIds, setSavedIds] = useState(new Set());
     const user = AuthService.getCurrentUser();
 
-    const getScholarshipPrice = (scholarship) => Number(
-        scholarship.standard_amount ?? scholarship.amount ?? 0
-    );
+    const getScholarshipPrice = (scholarship) => {
+        const val = Number(scholarship.standard_amount ?? scholarship.amount);
+        return isNaN(val) ? 0 : val;
+    };
     const toTitleCase = (value = '') =>
         String(value).charAt(0).toUpperCase() + String(value).slice(1).toLowerCase();
 
@@ -271,22 +281,22 @@ const Scholarships = () => {
                                 </div>
 
                                 {/* Meta Info */}
-                                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-50">
-                                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
-                                        <MapPin size={16} className="text-slate-400" />
-                                        <span className="truncate">{item.country}</span>
+                                <div className="grid grid-cols-2 gap-x-2 gap-y-3 pt-2 border-t border-slate-50">
+                                    <div className="flex items-start gap-2 text-sm font-semibold text-slate-600">
+                                        <MapPin size={16} className="text-slate-400 mt-0.5 shrink-0" />
+                                        <span className="break-words leading-tight">{item.country}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
-                                        <Award size={16} className="text-slate-400" />
-                                        <span className="truncate">{toTitleCase(item.type)}</span>
+                                    <div className="flex items-start gap-2 text-sm font-semibold text-slate-600">
+                                        <Award size={16} className="text-slate-400 mt-0.5 shrink-0" />
+                                        <span className="break-words leading-tight">{toTitleCase(item.type)}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
-                                        <DollarSign size={16} className="text-slate-400" />
-                                        <span className="truncate">{item.currency || ''} {Number(item.amount ?? 0).toLocaleString()}</span>
+                                    <div className="flex items-start gap-2 text-sm font-semibold text-slate-600">
+                                        <DollarSign size={16} className="text-slate-400 mt-0.5 shrink-0" />
+                                        <span className="break-words leading-tight">{formatScholarshipAmount(item.amount, item.currency)}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
-                                        <Calendar size={16} className="text-slate-400" />
-                                        <span className="truncate">{formatDate(item.deadline)}</span>
+                                    <div className="flex items-start gap-2 text-sm font-semibold text-slate-600">
+                                        <Calendar size={16} className="text-slate-400 mt-0.5 shrink-0" />
+                                        <span className="break-words leading-tight">{formatDate(item.deadline)}</span>
                                     </div>
                                 </div>
                             </div>

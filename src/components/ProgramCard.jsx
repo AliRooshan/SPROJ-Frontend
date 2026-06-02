@@ -9,8 +9,7 @@ const ProgramCard = ({ program, isGuest = false, isSaved = false, onToggleSave }
     const navigate = useNavigate();
 
     const formatDate = (dateString) => {
-        if (!dateString) return 'TBA';
-        return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        return dateString || 'TBA';
     };
 
     const handleNavigate = () => {

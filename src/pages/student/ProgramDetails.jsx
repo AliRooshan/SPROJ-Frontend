@@ -83,8 +83,7 @@ const ProgramDetails = () => {
     };
 
     const formatDate = (dateString) => {
-        if (!dateString) return 'TBA';
-        return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        return dateString || 'TBA';
     };
 
     if (!program) return <div className="p-12 text-center text-slate-500 font-bold animate-pulse">Loading program details...</div>;

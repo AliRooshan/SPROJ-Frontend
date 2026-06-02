@@ -34,8 +34,22 @@ const normalizeRequirementsInput = (raw) => {
 };
 
 const formatDate = (dateString) => {
-    if (!dateString) return 'TBA';
-    return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return dateString || 'TBA';
+};
+
+const formatScholarshipAmount = (amount, currency) => {
+    if (amount === null || amount === undefined || amount === '') return 'N/A';
+    const parsed = Number(amount);
+    if (!isNaN(parsed)) {
+        const formatted = parsed.toLocaleString();
+        return currency ? `${currency} ${formatted}` : formatted;
+    }
+    return amount;
+};
+
+const getNumericAmount = (s) => {
+    const val = Number(s.standard_amount ?? s.amount);
+    return isNaN(val) ? 0 : val;
 };
 
 const ManageScholarships = () => {
@@ -91,14 +105,14 @@ const ManageScholarships = () => {
     }, [searchParams, countries, currencies]);
 
     const maxAmount = useMemo(
-        () => Math.max(0, ...scholarships.map(s => Number(s.standard_amount ?? s.amount ?? 0))),
+        () => Math.max(0, ...scholarships.map(s => getNumericAmount(s))),
         [scholarships]
     );
 
     const filteredScholarships = useMemo(() => {
         return scholarships
             .filter((s) => {
-                const amount = Number(s.standard_amount ?? s.amount ?? 0);
+                const amount = getNumericAmount(s);
                 const matchesSearch =
                     (s.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                     (s.provider || '').toLowerCase().includes(searchTerm.toLowerCase());
@@ -108,8 +122,8 @@ const ManageScholarships = () => {
                 return matchesSearch && matchesCountry && matchesType && matchesAmount;
             })
             .sort((a, b) => {
-                if (sortBy === 'amount_low') return Number(a.standard_amount ?? a.amount) - Number(b.standard_amount ?? b.amount);
-                if (sortBy === 'amount_high') return Number(b.standard_amount ?? b.amount) - Number(a.standard_amount ?? a.amount);
+                if (sortBy === 'amount_low') return getNumericAmount(a) - getNumericAmount(b);
+                if (sortBy === 'amount_high') return getNumericAmount(b) - getNumericAmount(a);
                 return a.id - b.id;
             });
     }, [scholarships, searchTerm, filterCountry, filterType, amountMax, sortBy]);
@@ -126,7 +140,8 @@ const ManageScholarships = () => {
             description: '',
             requirements: '- ',
             website: '',
-            currency: currencies[0] || 'USD'
+            currency: currencies[0] || 'USD',
+            benefits: ''
         });
         setIsModalOpen(true);
     };
@@ -154,29 +169,25 @@ const ManageScholarships = () => {
             const requiredFields = [
                 activeScholarship.name, activeScholarship.provider, activeScholarship.amount, activeScholarship.deadline,
                 activeScholarship.country_id, activeScholarship.type, activeScholarship.description,
-                activeScholarship.requirements, activeScholarship.website, activeScholarship.currency
+                activeScholarship.requirements, activeScholarship.website
             ];
             if (requiredFields.some(v => String(v ?? '').trim() === '')) {
                 setErrorMsg('All fields are mandatory.');
-                return;
-            }
-            const amount = Number(activeScholarship.amount);
-            if (!Number.isFinite(amount) || amount <= 0) {
-                setErrorMsg('Amount must be a positive number.');
                 return;
             }
 
             const payload = {
                 name: activeScholarship.name,
                 provider: activeScholarship.provider,
-                amount,
+                amount: activeScholarship.amount,
                 deadline: activeScholarship.deadline,
                 country_id: Number(activeScholarship.country_id),
                 type: activeScholarship.type,
                 description: activeScholarship.description,
                 requirements: fromRequirementsText(activeScholarship.requirements),
                 website: activeScholarship.website,
-                currency: activeScholarship.currency
+                currency: activeScholarship.currency || null,
+                benefits: activeScholarship.benefits
             };
             if (mode === 'create') await api.post('/scholarships', payload);
             else await api.put(`/scholarships/${activeScholarship.id}`, payload);
@@ -271,8 +282,10 @@ const ManageScholarships = () => {
                         </div>
                         <div className="flex items-center gap-4">
                             <div className="text-right">
-                                <div className="text-zinc-900 font-bold">{s.currency} {Number(s.amount ?? 0).toLocaleString()}</div>
-                                <div className="text-[11px] text-zinc-500">USD: {Number(s.standard_amount ?? 0).toLocaleString()}</div>
+                                <div className="text-zinc-900 font-bold">{formatScholarshipAmount(s.amount, s.currency)}</div>
+                                {s.standard_amount != null && Number(s.standard_amount) !== 0 && (
+                                    <div className="text-[11px] text-zinc-500">USD: {Number(s.standard_amount).toLocaleString()}</div>
+                                )}
                             </div>
                             <div className="relative">
                                 <button onClick={() => setOpenMenuId(openMenuId === s.id ? null : s.id)} className="p-2 hover:bg-zinc-300 rounded-lg text-zinc-600">
@@ -320,17 +333,18 @@ const ManageScholarships = () => {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-zinc-600 mb-1">Amount</label>
-                                    <input type="number" min="0.01" step="0.01" value={activeScholarship.amount ?? ''} onChange={(e) => updateField('amount', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
+                                    <input type="text" value={activeScholarship.amount ?? ''} onChange={(e) => updateField('amount', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-zinc-600 mb-1">Currency</label>
-                                    <select value={activeScholarship.currency || 'USD'} onChange={(e) => updateField('currency', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900">
+                                    <select value={activeScholarship.currency || ''} onChange={(e) => updateField('currency', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900">
+                                        <option value="">No Currency</option>
                                         {currencies.map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-zinc-600 mb-1">Deadline</label>
-                                    <input type="date" value={activeScholarship.deadline ? String(activeScholarship.deadline).slice(0, 10) : ''} onChange={(e) => updateField('deadline', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
+                                    <input type="text" value={activeScholarship.deadline || ''} onChange={(e) => updateField('deadline', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-zinc-600 mb-1">Country</label>
@@ -348,9 +362,15 @@ const ManageScholarships = () => {
                                     <input type="url" value={activeScholarship.website || ''} onChange={(e) => updateField('website', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-xs font-bold text-zinc-600 mb-1">Description</label>
-                                <textarea rows={2} value={activeScholarship.description || ''} onChange={(e) => updateField('description', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900 resize-none" />
+                            <div className="grid grid-cols-1 gap-3">
+                                <div>
+                                    <label className="block text-xs font-bold text-zinc-600 mb-1">Benefits</label>
+                                    <textarea rows={2} value={activeScholarship.benefits || ''} onChange={(e) => updateField('benefits', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900 resize-none" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-zinc-600 mb-1">Description</label>
+                                    <textarea rows={2} value={activeScholarship.description || ''} onChange={(e) => updateField('description', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900 resize-none" />
+                                </div>
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-zinc-600 mb-1">Requirements (one rule per line)</label>
@@ -394,7 +414,7 @@ const ManageScholarships = () => {
                             <div className="text-zinc-700"><span className="text-zinc-500">Country:</span> {activeScholarship.country}</div>
                             <div className="text-zinc-700"><span className="text-zinc-500">Type:</span> {activeScholarship.type}</div>
                             <div className="text-zinc-700"><span className="text-zinc-500">Deadline:</span> {formatDate(activeScholarship.deadline)}</div>
-                            <div className="text-zinc-700"><span className="text-zinc-500">Amount:</span> {activeScholarship.currency} {Number(activeScholarship.amount ?? 0).toLocaleString()}</div>
+                            <div className="text-zinc-700"><span className="text-zinc-500">Amount:</span> {formatScholarshipAmount(activeScholarship.amount, activeScholarship.currency)}</div>
                             <div className="text-zinc-700 col-span-2">
                                 <span className="text-zinc-500">Website:</span>{' '}
                                 {activeScholarship.website ? (
@@ -404,6 +424,7 @@ const ManageScholarships = () => {
                                 ) : '—'}
                             </div>
                             <div className="text-zinc-700 col-span-2"><span className="text-zinc-500">Description:</span> {activeScholarship.description || '—'}</div>
+                            <div className="text-zinc-700 col-span-2"><span className="text-zinc-500">Benefits:</span> {activeScholarship.benefits || '—'}</div>
                             <div className="text-zinc-700 col-span-2">
                                 <span className="text-zinc-500 block mb-2">Requirements:</span>
                                 <div className="flex flex-wrap gap-1.5">

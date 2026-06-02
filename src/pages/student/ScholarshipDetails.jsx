@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Bookmark, ExternalLink, ChevronLeft, Award, CheckCircle } from 'lucide-react';
+import { Bookmark, ExternalLink, ChevronLeft, Award, CheckCircle, Gift } from 'lucide-react';
 import AuthService from '../../services/AuthService';
 import PageHeader from '../../components/PageHeader';
 import api from '../../services/api';
+
+const formatScholarshipAmount = (amount, currency) => {
+    if (amount === null || amount === undefined || amount === '') return 'N/A';
+    const parsed = Number(amount);
+    if (!isNaN(parsed)) {
+        const formatted = parsed.toLocaleString();
+        return currency ? `${currency} ${formatted}` : formatted;
+    }
+    return amount;
+};
 
 const ScholarshipDetails = () => {
     const { id } = useParams();
@@ -15,7 +25,6 @@ const ScholarshipDetails = () => {
         : typeof scholarship?.requirements === 'string'
             ? scholarship.requirements.split('\n').filter(Boolean)
             : [];
-    const scholarshipAmount = Number(scholarship?.amount ?? 0);
 
     useEffect(() => {
         api.get(`/scholarships/${id}`)
@@ -36,8 +45,7 @@ const ScholarshipDetails = () => {
     };
 
     const formatDate = (dateString) => {
-        if (!dateString) return 'TBA';
-        return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        return dateString || 'TBA';
     };
 
     if (!scholarship) return <div className="p-12 text-center text-slate-500 font-bold animate-pulse">Loading scholarship details...</div>;
@@ -95,26 +103,28 @@ const ScholarshipDetails = () => {
                     </div>
 
                     {/* Compact stat chips */}
-                    <div className="flex items-stretch gap-2 md:gap-2.5 w-full">
-                        <div className="flex flex-col px-2 md:px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
-                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Value</span>
-                            <span className="text-xs md:text-sm font-black text-slate-800 truncate">
-                                {scholarship.amount != null ? `${scholarship.currency || ''} ${scholarshipAmount.toLocaleString()}` : 'N/A'}
+                    <div className="flex flex-wrap md:flex-nowrap items-stretch gap-2 md:gap-2.5 w-full">
+                        <div className="flex flex-col px-2 md:px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5">Value</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 break-words leading-tight">
+                                {formatScholarshipAmount(scholarship.amount, scholarship.currency)}
                             </span>
                         </div>
-                        <div className="flex flex-col px-2 md:px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
-                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Type</span>
-                            <span className="text-xs md:text-sm font-black text-slate-800 truncate capitalize">{scholarship.type || 'N/A'}</span>
+                        <div className="flex flex-col px-2 md:px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5">Type</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 capitalize break-words leading-tight">{scholarship.type || 'N/A'}</span>
                         </div>
-                        <div className="flex flex-col px-2 md:px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0 overflow-hidden">
-                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5 truncate">Deadline</span>
-                            <span className="text-xs md:text-sm font-black text-slate-800 truncate">{formatDate(scholarship.deadline)}</span>
+                        <div className="flex flex-col px-2 md:px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-lg flex-1 min-w-0">
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide md:tracking-widest mb-0.5">Deadline</span>
+                            <span className="text-xs md:text-sm font-black text-slate-800 break-words leading-tight">{formatDate(scholarship.deadline)}</span>
                         </div>
                     </div>
 
-                    <p className="text-slate-600 text-medium leading-relaxed">
-                        {scholarship.description || <p className="text-slate-400 text-medium font-medium italic">No description available.</p>}
-                    </p>
+                    <div className="space-y-4">
+                        <p className="text-slate-600 text-medium leading-relaxed">
+                            {scholarship.description || <span className="text-slate-400 text-medium font-medium italic">No description available.</span>}
+                        </p>
+                    </div>
                 </div>
 
                 {/* Requirements */}
@@ -146,6 +156,21 @@ const ScholarshipDetails = () => {
                     </div>
                 )}
             </div>
+
+            {/* Benefits Card */}
+            {scholarship.benefits && (
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-4 md:p-7 md:space-y-6">
+                    <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+                        <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                            <Gift size={22} />
+                        </div>
+                        <h2 className="text-xl font-black text-slate-900">Benefits</h2>
+                    </div>
+                    <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">
+                        {scholarship.benefits}
+                    </p>
+                </div>
+            )}
         </div>
     );
 };

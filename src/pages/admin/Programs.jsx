@@ -40,8 +40,7 @@ const normalizeEligibilityInput = (raw) => {
 };
 
 const formatDate = (value) => {
-    if (!value) return '—';
-    return new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return value || '—';
 };
 
 const ManagePrograms = () => {
@@ -400,7 +399,7 @@ const ManagePrograms = () => {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-zinc-600 mb-1">Deadline</label>
-                                    <input type="date" value={activeProgram.deadline ? String(activeProgram.deadline).slice(0, 10) : ''} onChange={(e) => updateField('deadline', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
+                                    <input type="text" value={activeProgram.deadline || ''} onChange={(e) => updateField('deadline', e.target.value)} className="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-300 text-sm text-zinc-900" />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-zinc-600 mb-1">Tuition Amount</label>
