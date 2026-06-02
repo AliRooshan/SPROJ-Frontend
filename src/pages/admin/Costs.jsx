@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { Save, MapPin, Plus, X, Filter, Trash2 } from 'lucide-react';
+import { Save, MapPin, Plus, X, Filter, Trash2, Check, Loader2 } from 'lucide-react';
 import api from '../../services/api';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import AdminModalShell from '../../components/admin/AdminModalShell';
@@ -17,6 +17,8 @@ const ManageCosts = () => {
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [saveToast, setSaveToast] = useState(null);
     const saveToastTimerRef = useRef(null);
+    const [savingIds, setSavingIds] = useState(new Set());
+    const [savedIds, setSavedIds] = useState(new Set());
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [newLivingCost, setNewLivingCost] = useState({
@@ -112,6 +114,11 @@ const ManageCosts = () => {
     };
 
     const saveCostRow = async (row) => {
+        setSavingIds((prev) => {
+            const next = new Set(prev);
+            next.add(row.id);
+            return next;
+        });
         try {
             await api.put(`/costs/${row.id}`, {
                 city: row.city,
@@ -123,9 +130,26 @@ const ManageCosts = () => {
                 transport: Number(row.transport)
             });
             await loadCosts();
-            showSaveToast(`Saved ${row.city} (${String(row.lifestyle || '').toLowerCase()}).`);
+            setSavedIds((prev) => {
+                const next = new Set(prev);
+                next.add(row.id);
+                return next;
+            });
+            setTimeout(() => {
+                setSavedIds((prev) => {
+                    const next = new Set(prev);
+                    next.delete(row.id);
+                    return next;
+                });
+            }, 2000);
         } catch (err) {
             alert(`Failed to save living cost row: ${err.message}`);
+        } finally {
+            setSavingIds((prev) => {
+                const next = new Set(prev);
+                next.delete(row.id);
+                return next;
+            });
         }
     };
 
@@ -326,10 +350,23 @@ const ManageCosts = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => saveCostRow(row)}
-                                                className="inline-flex items-center justify-center p-1.5 bg-amber-500 hover:bg-amber-400 text-black rounded-lg"
-                                                title="Save"
+                                                disabled={savingIds.has(row.id)}
+                                                className={`inline-flex items-center justify-center p-1.5 rounded-lg transition-colors duration-200 ${
+                                                    savedIds.has(row.id)
+                                                        ? 'bg-emerald-500 hover:bg-emerald-400 text-white font-bold'
+                                                        : savingIds.has(row.id)
+                                                        ? 'bg-zinc-300 text-zinc-500 cursor-wait'
+                                                        : 'bg-amber-500 hover:bg-amber-400 text-black font-bold'
+                                                }`}
+                                                title={savedIds.has(row.id) ? 'Saved' : savingIds.has(row.id) ? 'Saving...' : 'Save'}
                                             >
-                                                <Save size={14} />
+                                                {savedIds.has(row.id) ? (
+                                                    <Check size={14} className="animate-in zoom-in duration-200" />
+                                                ) : savingIds.has(row.id) ? (
+                                                    <Loader2 size={14} className="animate-spin" />
+                                                ) : (
+                                                    <Save size={14} />
+                                                )}
                                             </button>
                                             <button
                                                 type="button"

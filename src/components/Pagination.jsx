@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination = ({ currentPage, totalPages, onPageChange, isAdmin = false }) => {
     if (totalPages <= 1) return null;
 
     // Helper to get page numbers to display (with ellipsis support)
@@ -37,6 +37,18 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         return pages;
     };
 
+    const hoverClass = isAdmin 
+        ? 'hover:bg-amber-50 hover:text-amber-700' 
+        : 'hover:bg-indigo-50 hover:text-indigo-600';
+
+    const activeClass = isAdmin 
+        ? 'bg-amber-500 text-black shadow-md' 
+        : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-md';
+
+    const inactiveClass = isAdmin
+        ? 'bg-white border border-slate-200 text-slate-600 hover:bg-amber-50 hover:text-amber-700'
+        : 'bg-white border border-slate-200 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600';
+
     return (
         <div className="flex items-center justify-center gap-2 pt-8 pb-4 select-none">
             {/* Prev Button */}
@@ -44,7 +56,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                 type="button"
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-slate-600 transition-all shadow-sm hover:shadow active:scale-95"
+                className={`flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-slate-600 transition-all shadow-sm hover:shadow active:scale-95 ${hoverClass}`}
             >
                 <ChevronLeft size={18} />
             </button>
@@ -66,7 +78,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                             type="button"
                             key={`page-${page}`}
                             onClick={() => onPageChange(page)}
-                            className={`h-10 min-w-10 px-3.5 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 ${isActive ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'}`}
+                            className={`h-10 min-w-10 px-3.5 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 ${isActive ? activeClass : inactiveClass}`}
                         >
                             {page}
                         </button>
@@ -79,7 +91,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                 type="button"
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-slate-600 transition-all shadow-sm hover:shadow active:scale-95"
+                className={`flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-slate-600 transition-all shadow-sm hover:shadow active:scale-95 ${hoverClass}`}
             >
                 <ChevronRight size={18} />
             </button>

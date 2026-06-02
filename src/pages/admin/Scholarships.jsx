@@ -4,6 +4,7 @@ import { Search, Plus, Filter, MoreHorizontal, X, Edit2, Trash2, Eye, Clock, Glo
 import api from '../../services/api';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import AdminModalShell from '../../components/admin/AdminModalShell';
+import Pagination from '../../components/Pagination';
 
 const toRequirementsText = (requirements) =>
     (Array.isArray(requirements) ? requirements : [])
@@ -67,6 +68,10 @@ const ManageScholarships = () => {
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [sortBy, setSortBy] = useState('id');
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+
     const [openMenuId, setOpenMenuId] = useState(null);
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -75,30 +80,60 @@ const ManageScholarships = () => {
     const [activeScholarship, setActiveScholarship] = useState(null);
     const [errorMsg, setErrorMsg] = useState('');
 
-    const loadData = async () => {
-        setLoading(true);
+    const loadFiltersAndStatic = async () => {
         try {
-            const [schData, filtersData, countriesData, currenciesData] = await Promise.all([
-                api.get('/scholarships'),
+            const [filtersData, countriesData, currenciesData] = await Promise.all([
                 api.get('/scholarships/filters'),
                 api.get('/scholarships/countries'),
                 api.get('/scholarships/currencies')
             ]);
-            setScholarships(schData);
             setFilters({
                 countries: filtersData.countries || [],
                 types: filtersData.types || []
             });
             setCountries(countriesData || []);
             setCurrencies(Array.isArray(currenciesData) && currenciesData.length ? currenciesData : ['USD']);
+        } catch (err) {
+            console.error('Failed to load static filters:', err);
+        }
+    };
+
+    const loadPageData = async () => {
+        setLoading(true);
+        try {
+            const queryParams = new URLSearchParams({
+                page: currentPage,
+                limit: 10,
+                search: searchTerm,
+                country: filterCountry !== 'All' ? filterCountry : '',
+                type: filterType !== 'All' ? filterType : '',
+                sort_by: sortBy
+            });
+            if (amountMax !== null) {
+                queryParams.append('amount_max', amountMax);
+            }
+            const schData = await api.get(`/scholarships?${queryParams.toString()}`);
+            setScholarships(schData.results || []);
+            setTotalPages(schData.totalPages || 1);
+            setTotalCount(schData.total || 0);
+        } catch (err) {
+            console.error(err);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        loadData().catch(console.error);
+        loadFiltersAndStatic().catch(console.error);
     }, []);
+
+    useEffect(() => {
+        loadPageData().catch(console.error);
+    }, [currentPage, searchTerm, filterCountry, filterType, amountMax, sortBy]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, filterCountry, filterType, amountMax, sortBy]);
 
     useEffect(() => {
         if (searchParams.get('action') === 'add') openAddModal();
@@ -109,24 +144,7 @@ const ManageScholarships = () => {
         [scholarships]
     );
 
-    const filteredScholarships = useMemo(() => {
-        return scholarships
-            .filter((s) => {
-                const amount = getNumericAmount(s);
-                const matchesSearch =
-                    (s.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    (s.provider || '').toLowerCase().includes(searchTerm.toLowerCase());
-                const matchesCountry = filterCountry === 'All' || s.country === filterCountry;
-                const matchesType = filterType === 'All' || s.type === filterType;
-                const matchesAmount = amountMax == null || amount <= amountMax;
-                return matchesSearch && matchesCountry && matchesType && matchesAmount;
-            })
-            .sort((a, b) => {
-                if (sortBy === 'amount_low') return getNumericAmount(a) - getNumericAmount(b);
-                if (sortBy === 'amount_high') return getNumericAmount(b) - getNumericAmount(a);
-                return a.id - b.id;
-            });
-    }, [scholarships, searchTerm, filterCountry, filterType, amountMax, sortBy]);
+    const filteredScholarships = scholarships;
 
     const openAddModal = () => {
         setErrorMsg('');
@@ -149,7 +167,7 @@ const ManageScholarships = () => {
     const openEditModal = (item) => {
         setOpenMenuId(null);
         setErrorMsg('');
-        const countryId = countries.find(c => c.name === item.country)?.id || '';
+        const countryId = item.country_id || countries.find(c => c.name === item.country)?.id || '';
         setActiveScholarship({
             ...item,
             country_id: countryId,
@@ -169,7 +187,7 @@ const ManageScholarships = () => {
             const requiredFields = [
                 activeScholarship.name, activeScholarship.provider, activeScholarship.amount, activeScholarship.deadline,
                 activeScholarship.country_id, activeScholarship.type, activeScholarship.description,
-                activeScholarship.requirements, activeScholarship.website
+                activeScholarship.requirements
             ];
             if (requiredFields.some(v => String(v ?? '').trim() === '')) {
                 setErrorMsg('All fields are mandatory.');
@@ -185,13 +203,13 @@ const ManageScholarships = () => {
                 type: activeScholarship.type,
                 description: activeScholarship.description,
                 requirements: fromRequirementsText(activeScholarship.requirements),
-                website: activeScholarship.website,
+                website: activeScholarship.website || null,
                 currency: activeScholarship.currency || null,
                 benefits: activeScholarship.benefits
             };
             if (mode === 'create') await api.post('/scholarships', payload);
             else await api.put(`/scholarships/${activeScholarship.id}`, payload);
-            await loadData();
+            await loadPageData();
             setIsModalOpen(false);
             setIsEditModalOpen(false);
             setActiveScholarship(null);
@@ -204,7 +222,7 @@ const ManageScholarships = () => {
     const handleDeleteScholarship = async (id) => {
         try {
             await api.delete(`/scholarships/${id}`);
-            await loadData();
+            await loadPageData();
             setDeleteConfirmId(null);
             setOpenMenuId(null);
         } catch (err) {
@@ -312,6 +330,13 @@ const ManageScholarships = () => {
                     <div className="p-12 text-center text-zinc-500">No scholarships found.</div>
                 )}
             </div>
+
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                isAdmin={true}
+            />
 
             {(isModalOpen || isEditModalOpen) && activeScholarship && (
                 <AdminModalShell>

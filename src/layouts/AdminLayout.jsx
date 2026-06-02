@@ -1,10 +1,23 @@
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
+import AuthService from '../services/AuthService';
 
 const AdminLayout = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const navigate = useNavigate();
+    const user = AuthService.getCurrentUser();
+
+    useEffect(() => {
+        if (!user || !user.isAdmin) {
+            navigate('/login', { replace: true });
+        }
+    }, [user, navigate]);
+
+    if (!user || !user.isAdmin) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen relative flex selection:bg-amber-300 selection:text-zinc-900 overflow-hidden bg-zinc-200 font-sans text-zinc-800">

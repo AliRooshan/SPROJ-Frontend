@@ -4,6 +4,7 @@ import { Search, Plus, Filter, MoreHorizontal, MapPin, X, Edit2, Trash2, Eye, Cl
 import api from '../../services/api';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import AdminModalShell from '../../components/admin/AdminModalShell';
+import Pagination from '../../components/Pagination';
 
 const toEligibilityText = (eligibility) =>
     (Array.isArray(eligibility) ? eligibility : [])
@@ -59,6 +60,10 @@ const ManagePrograms = () => {
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [sortBy, setSortBy] = useState('id');
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+
     const [openMenuId, setOpenMenuId] = useState(null);
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,16 +73,13 @@ const ManagePrograms = () => {
     const [errorMsg, setErrorMsg] = useState('');
     const [isSaving, setIsSaving] = useState(false);
 
-    const loadData = async () => {
-        setLoading(true);
+    const loadStaticData = async () => {
         try {
-            const [programsData, universitiesData, filterData, currenciesData] = await Promise.all([
-                api.get('/programs'),
+            const [universitiesData, filterData, currenciesData] = await Promise.all([
                 api.get('/programs/universities'),
                 api.get('/programs/filters'),
                 api.get('/programs/currencies')
             ]);
-            setPrograms(programsData);
             setUniversities(universitiesData);
             setCurrencies(Array.isArray(currenciesData) && currenciesData.length ? currenciesData : ['USD']);
             setFilters({
@@ -85,14 +87,48 @@ const ManagePrograms = () => {
                 durations: filterData.durations || [],
                 degrees: filterData.degrees || []
             });
+        } catch (err) {
+            console.error('Failed to load static filters:', err);
+        }
+    };
+
+    const loadPageData = async () => {
+        setLoading(true);
+        try {
+            const queryParams = new URLSearchParams({
+                page: currentPage,
+                limit: 10,
+                search: searchTerm,
+                countries: filterCountry !== 'All' ? filterCountry : '',
+                degrees: filterDegree !== 'All' ? filterDegree : '',
+                durations: filterDuration !== 'All' ? filterDuration : '',
+                sort_by: sortBy
+            });
+            if (tuitionMax !== null) {
+                queryParams.append('tuition_max', tuitionMax);
+            }
+            const programsData = await api.get(`/programs?${queryParams.toString()}`);
+            setPrograms(programsData.results || []);
+            setTotalPages(programsData.totalPages || 1);
+            setTotalCount(programsData.total || 0);
+        } catch (err) {
+            console.error(err);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        loadData().catch(console.error);
+        loadStaticData().catch(console.error);
     }, []);
+
+    useEffect(() => {
+        loadPageData().catch(console.error);
+    }, [currentPage, searchTerm, filterCountry, filterDegree, filterDuration, tuitionMax, sortBy]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, filterCountry, filterDegree, filterDuration, tuitionMax, sortBy]);
 
     useEffect(() => {
         if (searchParams.get('action') === 'add') setIsModalOpen(true);
@@ -103,26 +139,7 @@ const ManagePrograms = () => {
         [programs]
     );
 
-    const filteredPrograms = useMemo(() => {
-        return programs
-            .filter((p) => {
-                const tuition = Number(p.standard_tuition ?? p.tuition_amount ?? 0);
-                const matchesSearch =
-                    (p.program || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    (p.university || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    (p.field_of_study || '').toLowerCase().includes(searchTerm.toLowerCase());
-                const matchesCountry = filterCountry === 'All' || p.country === filterCountry;
-                const matchesDegree = filterDegree === 'All' || p.degree_level === filterDegree;
-                const matchesDuration = filterDuration === 'All' || p.duration === filterDuration;
-                const matchesTuition = tuitionMax == null || tuition <= tuitionMax;
-                return matchesSearch && matchesCountry && matchesDegree && matchesDuration && matchesTuition;
-            })
-            .sort((a, b) => {
-                if (sortBy === 'price_low') return Number(a.standard_tuition ?? a.tuition_amount) - Number(b.standard_tuition ?? b.tuition_amount);
-                if (sortBy === 'price_high') return Number(b.standard_tuition ?? b.tuition_amount) - Number(a.standard_tuition ?? a.tuition_amount);
-                return a.id - b.id;
-            });
-    }, [programs, searchTerm, filterCountry, filterDegree, filterDuration, tuitionMax, sortBy]);
+    const filteredPrograms = programs;
 
     const openAddModal = () => {
         setErrorMsg('');
@@ -171,8 +188,7 @@ const ManagePrograms = () => {
                 ['currency', activeProgram.currency],
                 ['duration', activeProgram.duration],
                 ['description', activeProgram.description],
-                ['eligibility', activeProgram.eligibility],
-                ['website', activeProgram.website]
+                ['eligibility', activeProgram.eligibility]
             ];
             const missing = requiredFields.filter(([, value]) => String(value ?? '').trim() === '');
             if (missing.length > 0) {
@@ -195,11 +211,11 @@ const ManagePrograms = () => {
                 duration: activeProgram.duration,
                 description: activeProgram.description,
                 eligibility: fromEligibilityText(activeProgram.eligibility),
-                website: activeProgram.website
+                website: activeProgram.website || null
             };
             if (mode === 'create') await api.post('/programs', payload);
             else await api.put(`/programs/${activeProgram.id}`, payload);
-            await loadData();
+            await loadPageData();
             setIsModalOpen(false);
             setIsEditModalOpen(false);
             setActiveProgram(null);
@@ -214,7 +230,7 @@ const ManagePrograms = () => {
     const handleDeleteProgram = async (id) => {
         try {
             await api.delete(`/programs/${id}`);
-            await loadData();
+            await loadPageData();
             setDeleteConfirmId(null);
             setOpenMenuId(null);
         } catch (err) {
@@ -345,6 +361,13 @@ const ManagePrograms = () => {
                     <div className="p-12 text-center text-zinc-500">No programs found.</div>
                 )}
             </div>
+
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                isAdmin={true}
+            />
 
             {(isModalOpen || isEditModalOpen) && activeProgram && (
                 <AdminModalShell>
