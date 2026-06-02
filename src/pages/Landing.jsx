@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Zap, Target, Shield, Rocket, Star, Globe, Compass } from 'lucide-react';
+import { ArrowRight, Zap, Target, Shield, Rocket, Star, Globe, Compass, X } from 'lucide-react';
 
 const Landing = () => {
+    const [activeTooltip, setActiveTooltip] = useState(null);
+    const [lockedTooltip, setLockedTooltip] = useState(null);
+
     return (
         <div className="min-h-screen text-slate-900 overflow-hidden selection:bg-primary selection:text-white relative">
 
@@ -200,15 +203,99 @@ const Landing = () => {
                         <div className="pt-5 border-t border-indigo-100 flex flex-col md:flex-row justify-between items-center gap-3">
                             <p className="text-slate-500 text-sm">© 2026 EdVoyage. All rights reserved.</p>
                             <div className="flex gap-5 text-sm">
-                                <a href="#" className="text-slate-500 hover:text-indigo-600 transition-colors">Privacy Policy</a>
-                                <a href="#" className="text-slate-500 hover:text-indigo-600 transition-colors">Terms of Service</a>
-                                <a href="#" className="text-slate-500 hover:text-indigo-600 transition-colors">Contact</a>
+                                {/* Privacy Policy */}
+                                <div 
+                                    className="relative"
+                                    onMouseEnter={() => setActiveTooltip('privacy')}
+                                    onMouseLeave={() => setActiveTooltip(null)}
+                                >
+                                    <a 
+                                        href="#" 
+                                        onClick={(e) => { e.preventDefault(); setLockedTooltip(prev => prev === 'privacy' ? null : 'privacy'); }}
+                                        className={`text-slate-500 hover:text-indigo-600 transition-colors ${lockedTooltip === 'privacy' ? 'text-indigo-600 font-bold' : ''}`}
+                                    >
+                                        Privacy Policy
+                                    </a>
+                                    {(activeTooltip === 'privacy' || lockedTooltip === 'privacy') && (
+                                        <div className="absolute bottom-full left-0 mb-3 bg-white/95 border border-indigo-100 shadow-2xl rounded-2xl p-4 text-[11px] text-left text-slate-700 w-72 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-200 z-40 pointer-events-none">
+                                            <div className="font-bold text-slate-900 border-b border-indigo-50 pb-1 mb-1.5 flex items-center gap-1.5">
+                                                <Shield size={14} className="text-indigo-500" /> Privacy Policy Summary
+                                            </div>
+                                            <ul className="space-y-1 list-disc list-inside text-slate-600">
+                                                <li>We collect name, email, GPA, & preference details.</li>
+                                                <li>Data is processed using AI to personalize your study abroad planning.</li>
+                                                <li>We do not sell or rent user data.</li>
+                                                <li>You have complete rights to request data deletion at any time.</li>
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Terms of Service */}
+                                <div 
+                                    className="relative"
+                                    onMouseEnter={() => setActiveTooltip('terms')}
+                                    onMouseLeave={() => setActiveTooltip(null)}
+                                >
+                                    <a 
+                                        href="#" 
+                                        onClick={(e) => { e.preventDefault(); setLockedTooltip(prev => prev === 'terms' ? null : 'terms'); }}
+                                        className={`text-slate-500 hover:text-indigo-600 transition-colors ${lockedTooltip === 'terms' ? 'text-indigo-600 font-bold' : ''}`}
+                                    >
+                                        Terms of Service
+                                    </a>
+                                    {(activeTooltip === 'terms' || lockedTooltip === 'terms') && (
+                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-white/95 border border-indigo-100 shadow-2xl rounded-2xl p-4 text-[11px] text-left text-slate-700 w-72 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-200 z-40 pointer-events-none">
+                                            <div className="font-bold text-slate-900 border-b border-indigo-50 pb-1 mb-1.5 flex items-center gap-1.5">
+                                                <Target size={14} className="text-indigo-500" /> Terms of Service Summary
+                                            </div>
+                                            <ul className="space-y-1 list-disc list-inside text-slate-600">
+                                                <li>AI educational planner is decision-support only.</li>
+                                                <li>Users must submit accurate profile information.</li>
+                                                <li>Recommendations do not guarantee university admission.</li>
+                                                <li>Platform designs, code, and content belong to EdVoyage.</li>
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Contact */}
+                                <div 
+                                    className="relative"
+                                    onMouseEnter={() => setActiveTooltip('contact')}
+                                    onMouseLeave={() => setActiveTooltip(null)}
+                                >
+                                    <a 
+                                        href="#" 
+                                        onClick={(e) => { e.preventDefault(); setLockedTooltip(prev => prev === 'contact' ? null : 'contact'); }}
+                                        className={`text-slate-500 hover:text-indigo-600 transition-colors ${lockedTooltip === 'contact' ? 'text-indigo-600 font-bold' : ''}`}
+                                    >
+                                        Contact
+                                    </a>
+                                    {(activeTooltip === 'contact' || lockedTooltip === 'contact') && (
+                                        <div className="absolute bottom-full right-0 mb-3 bg-white/95 border border-indigo-100 shadow-2xl rounded-2xl p-4 text-[11px] text-left text-slate-700 w-72 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-200 z-40 pointer-events-none">
+                                            <div className="font-bold text-slate-900 border-b border-indigo-50 pb-1 mb-1.5 flex items-center gap-1.5">
+                                                <Globe size={14} className="text-indigo-500" /> Contact Info
+                                            </div>
+                                            <p className="text-slate-600 mb-1"><strong>Email:</strong> edvoyagesupport@gmail.com</p>
+                                            <p className="text-slate-600 mb-1"><strong>Team:</strong> Faiqa Anwar, Nawal Hafeez, Ali Rooshan Mazhar</p>
+                                            <p className="text-slate-600"><strong>FCCU:</strong> Dept of Computer Science, Lahore, Pakistan</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </footer>
-            </div>
 
+                {/* Click outside overlay to dismiss locked tooltips */}
+                {lockedTooltip && (
+                    <div 
+                        className="fixed inset-0 z-30 cursor-default" 
+                        onClick={() => setLockedTooltip(null)} 
+                    />
+                )}
+            </div>
         </div>
     );
 };
