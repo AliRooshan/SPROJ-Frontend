@@ -278,7 +278,8 @@ const StudentDashboard = () => {
                                         </span>
                                     </div>
                                 </div>
-                            }) : (
+                            );
+                        }) : (
                                 <div className="h-full flex flex-col items-center justify-center text-center p-6 py-12 bg-white/40 rounded-2xl border border-dashed border-red-100">
                                     <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mb-4">
                                         <CalendarCheck className="text-red-300" size={24} />
