@@ -295,6 +295,14 @@ const changePassword = async ({ currentPassword, newPassword, confirmPassword })
   });
 };
 
+const forgotPassword = async (email) => {
+  return api.post('/auth/forgot-password', { email });
+};
+
+const resetPassword = async (token, password) => {
+  return api.post('/auth/reset-password', { token, password });
+};
+
 // ── Export ─────────────────────────────────────────────────────────────────────
 
 const AuthService = {
@@ -321,6 +329,8 @@ const AuthService = {
   updateApplicationStatus,
   deleteApplication,
   changePassword,
+  forgotPassword,
+  resetPassword,
 };
 
 export default AuthService;

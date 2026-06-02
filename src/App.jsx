@@ -10,6 +10,7 @@ import AdminLayout from './layouts/AdminLayout';
 // Common Pages
 import Landing from './pages/Landing';
 import Auth from './pages/auth/Auth';
+import ResetPassword from './pages/auth/ResetPassword';
 
 
 // Student Pages
@@ -42,6 +43,7 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Auth />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/explore" element={<Explore isGuest={true} />} />
         </Route>
 

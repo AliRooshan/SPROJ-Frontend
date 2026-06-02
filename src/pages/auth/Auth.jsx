@@ -8,10 +8,15 @@ const Auth = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSignUp, setIsSignUp] = useState(location.state?.isSignUp || false);
+    const [isForgotPassword, setIsForgotPassword] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
 
     // Update state when location changes (e.g. clicking header links)
     React.useEffect(() => {
         setIsSignUp(location.state?.isSignUp || false);
+        setIsForgotPassword(false);
+        setError('');
+        setSuccessMessage('');
     }, [location.state]);
 
     const [showPassword, setShowPassword] = useState(false);
@@ -29,15 +34,20 @@ const Auth = () => {
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         setError('');
+        setSuccessMessage('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
+        setSuccessMessage('');
 
         try {
-            if (isSignUp) {
+            if (isForgotPassword) {
+                const res = await AuthService.forgotPassword(formData.email);
+                setSuccessMessage(res.message || 'If an account exists with that email, a password reset link has been sent.');
+            } else if (isSignUp) {
                 if (formData.password !== formData.confirmPassword) {
                     setError('Passwords do not match');
                     setIsLoading(false);
@@ -63,7 +73,25 @@ const Auth = () => {
 
     const toggleMode = () => {
         setIsSignUp(!isSignUp);
+        setIsForgotPassword(false);
         setError('');
+        setSuccessMessage('');
+        setFormData({ email: '', password: '', confirmPassword: '', fullName: '' });
+    };
+
+    const handleForgotPasswordClick = () => {
+        setIsForgotPassword(true);
+        setIsSignUp(false);
+        setError('');
+        setSuccessMessage('');
+        setFormData({ email: '', password: '', confirmPassword: '', fullName: '' });
+    };
+
+    const handleBackToSignIn = () => {
+        setIsForgotPassword(false);
+        setIsSignUp(false);
+        setError('');
+        setSuccessMessage('');
         setFormData({ email: '', password: '', confirmPassword: '', fullName: '' });
     };
 
@@ -132,10 +160,10 @@ const Auth = () => {
             >
                 {/* Auth Card */}
                 <div className="relative" style={{ perspective: '1000px' }}>
-                    <AnimatePresence mode="wait" custom={isSignUp ? 1 : -1}>
+                    <AnimatePresence mode="wait" custom={isForgotPassword ? 2 : (isSignUp ? 1 : -1)}>
                         <motion.div
-                            key={isSignUp ? 'signup' : 'signin'}
-                            custom={isSignUp ? 1 : -1}
+                            key={isForgotPassword ? 'forgot' : (isSignUp ? 'signup' : 'signin')}
+                            custom={isForgotPassword ? 2 : (isSignUp ? 1 : -1)}
                             variants={formVariants}
                             initial="enter"
                             animate="center"
@@ -145,7 +173,11 @@ const Auth = () => {
                             {/* Header */}
                             <div className="mb-4 md:mb-6">
                                 <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-1 md:mb-2 flex items-center gap-2">
-                                    {isSignUp ? (
+                                    {isForgotPassword ? (
+                                        <>
+                                            Forgot Password
+                                        </>
+                                    ) : isSignUp ? (
                                         <>
                                             Create Account
                                         </>
@@ -156,9 +188,11 @@ const Auth = () => {
                                     )}
                                 </h2>
                                 <p className="text-slate-600 text-sm md:text-base">
-                                    {isSignUp
-                                        ? 'Start your educational journey today'
-                                        : 'Continue your journey to success'}
+                                    {isForgotPassword
+                                        ? 'Enter your email to request a reset link'
+                                        : isSignUp
+                                            ? 'Start your educational journey today'
+                                            : 'Continue your journey to success'}
                                 </p>
                             </div>
 
@@ -172,6 +206,20 @@ const Auth = () => {
                                         className="mb-4 p-3 bg-red-50 border-2 border-red-200 rounded-xl text-red-600 text-sm font-medium"
                                     >
                                         {error}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* Success Message */}
+                            <AnimatePresence>
+                                {successMessage && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="mb-4 p-3 bg-emerald-50 border-2 border-emerald-200 rounded-xl text-emerald-600 text-sm font-medium"
+                                    >
+                                        {successMessage}
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -225,36 +273,49 @@ const Auth = () => {
                                     </div>
                                 </motion.div>
 
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: isSignUp ? 0.25 : 0.15 }}
-                                >
-                                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                                        Password
-                                    </label>
-                                    <div className="relative group">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={20} />
-                                        <input
-                                            type={(!isSignUp && showPassword) ? "text" : "password"}
-                                            name="password"
-                                            value={formData.password}
-                                            onChange={handleInputChange}
-                                            required
-                                            className={`w-full pl-12 ${!isSignUp ? 'pr-12' : 'pr-4'} py-2.5 md:py-3.5 bg-white border-2 border-indigo-100 rounded-lg md:rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm md:text-base text-slate-900 font-medium placeholder-slate-400`}
-                                            placeholder="••••••••"
-                                        />
-                                        {!isSignUp && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors"
-                                            >
-                                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                            </button>
-                                        )}
-                                    </div>
-                                </motion.div>
+                                {!isForgotPassword && (
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: isSignUp ? 0.25 : 0.15 }}
+                                    >
+                                        <div className="flex justify-between items-center mb-2">
+                                            <label className="block text-sm font-bold text-slate-700">
+                                                Password
+                                            </label>
+                                            {!isSignUp && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleForgotPasswordClick}
+                                                    className="text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors hover:underline"
+                                                >
+                                                    Forgot Password?
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="relative group">
+                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={20} />
+                                            <input
+                                                type={(!isSignUp && showPassword) ? "text" : "password"}
+                                                name="password"
+                                                value={formData.password}
+                                                onChange={handleInputChange}
+                                                required={!isForgotPassword}
+                                                className={`w-full pl-12 ${!isSignUp ? 'pr-12' : 'pr-4'} py-2.5 md:py-3.5 bg-white border-2 border-indigo-100 rounded-lg md:rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm md:text-base text-slate-900 font-medium placeholder-slate-400`}
+                                                placeholder="••••••••"
+                                            />
+                                            {!isSignUp && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors"
+                                                >
+                                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                                </button>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                )}
 
                                 {isSignUp && (
                                     <motion.div
@@ -292,7 +353,7 @@ const Auth = () => {
                                         <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
                                     ) : (
                                         <>
-                                            {isSignUp ? 'Create Account' : 'Sign In'}
+                                            {isForgotPassword ? 'Send Reset Link' : isSignUp ? 'Create Account' : 'Sign In'}
                                             <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
                                         </>
                                     )}
@@ -301,17 +362,27 @@ const Auth = () => {
 
                             {/* Toggle Mode */}
                             <div className="mt-4 md:mt-6 text-center">
-                                <p className="text-slate-600 text-sm md:text-base">
-                                    {isSignUp ? 'Already have an account?' : "Don't have an account?"}
-                                    {' '}
+                                {isForgotPassword ? (
                                     <button
                                         type="button"
-                                        onClick={toggleMode}
-                                        className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors underline"
+                                        onClick={handleBackToSignIn}
+                                        className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors underline text-sm md:text-base"
                                     >
-                                        {isSignUp ? 'Sign In' : 'Sign Up'}
+                                        Back to Sign In
                                     </button>
-                                </p>
+                                ) : (
+                                    <p className="text-slate-600 text-sm md:text-base">
+                                        {isSignUp ? 'Already have an account?' : "Don't have an account?"}
+                                        {' '}
+                                        <button
+                                            type="button"
+                                            onClick={toggleMode}
+                                            className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors underline"
+                                        >
+                                            {isSignUp ? 'Sign In' : 'Sign Up'}
+                                        </button>
+                                    </p>
+                                )}
                             </div>
                         </motion.div>
                     </AnimatePresence>
